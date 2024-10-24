@@ -17,9 +17,10 @@ const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor
       
       <div className='container'>
         
-      <img 
+        <img 
           src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png"
           alt="Logo"
+          className='mx-auto'
         />
        
         <input type='submit' onClick={goToOrder} value='ดูรายการสั่งอาหาร' />

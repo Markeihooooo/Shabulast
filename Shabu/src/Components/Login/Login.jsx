@@ -24,12 +24,13 @@ const Login = () => {
     <div className='container'>
     
     <div>
-        <img src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="Logo" />
+        <img className='mx-auto' src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="Logo" />
     </div>
 
       <p>ยินดีต้อนรับสู่ร้านชาบู</p>
       <p>ลงชื่อเข้าใช้งาน</p>
-      <input type="text" 
+      <input 
+      type="text" 
       placeholder='Username' 
       value={username}
       onChange={(e)=>setUsername(e.target.value)}/>
