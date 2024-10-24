@@ -1,0 +1,36 @@
+p {
+    color: rgb(0, 92, 122);
+    font-size: 20px;
+    text-align: center;
+    
+}
+
+
+  .Roleselect {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 300px; /* หรือปรับตามที่ต้องการ */
+    cursor: pointer;
+  }
+  
+  .Roleselect:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+  }
+  
+  .Roleselect option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
+  }
+  
+  .Roleselect option:hover {
+    background-color: #f0f0f0;
+  }

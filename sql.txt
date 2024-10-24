@@ -1,0 +1,74 @@
+-- Create table for Employees
+CREATE TABLE employees (
+    EmployeeID SERIAL PRIMARY KEY,
+    Username VARCHAR(255) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(15),
+    Role VARCHAR(50) NOT NULL CHECK (Role IN ('เจ้าของ', 'พนักงานร้าน', 'คนทำอาหาร')),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create table for Tables
+CREATE TABLE tables (
+    TableID SERIAL PRIMARY KEY,
+    Number VARCHAR(50) NOT NULL,
+    Status VARCHAR(50) CHECK (Status IN ('ว่าง', 'ไม่ว่าง')),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create table for Food Categories
+CREATE TABLE food_categories (
+    CategoryID SERIAL PRIMARY KEY,
+    CategoryName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    CreatedBy INTEGER REFERENCES employees(EmployeeID),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create table for Foods
+CREATE TABLE foods (
+    FoodID SERIAL PRIMARY KEY,
+    FoodName VARCHAR(255) NOT NULL,
+    CategoryID INTEGER REFERENCES food_categories(CategoryID),
+    Price DECIMAL(10,2) NOT NULL,
+    ImageURL VARCHAR(255),
+    Status VARCHAR(10) CHECK (Status IN ('มี', 'ไม่มี')),
+    CreatedBy INTEGER REFERENCES employees(EmployeeID),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create table for Customers
+CREATE TABLE customers (
+    CustomerID SERIAL PRIMARY KEY,
+    TableID INTEGER REFERENCES tables(TableID),
+    NumberOfPeople INTEGER NOT NULL,
+    QRCode VARCHAR(255) NOT NULL,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create table for Orders
+CREATE TABLE orders (
+    OrderID SERIAL PRIMARY KEY,
+    CustomerID INTEGER REFERENCES customers(CustomerID),
+    OrderStatus VARCHAR(50) CHECK (OrderStatus IN ('รอตำเนินการ', 'กำลังเตรียม', 'เสิร์จสิ้น')),
+    CreatedBy INTEGER REFERENCES employees(EmployeeID),
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create table for Order Details
+CREATE TABLE order_details (
+    OrderDetailID SERIAL PRIMARY KEY,
+    OrderID INTEGER REFERENCES orders(OrderID),
+    FoodID INTEGER REFERENCES foods(FoodID),
+    Quantity INTEGER NOT NULL,
+    SubTotal DECIMAL(10,2) NOT NULL
+);
+
+-- Create table for Payment Status
+CREATE TABLE payment_status (
+    PaymentID SERIAL PRIMARY KEY,
+    OrderID INTEGER REFERENCES orders(OrderID),
+    PaidBy INTEGER REFERENCES employees(EmployeeID),
+    TotalAmount DECIMAL(10,2) NOT NULL,
+    PaymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

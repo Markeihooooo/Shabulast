@@ -1,0 +1,38 @@
+.main-container {
+    display: flex;
+    height: auto; 
+  }
+  
+  .sidebar {
+    flex: 1; /* ใช้พื้นที่ส่วนซ้าย 1/3 */
+    background-color: #f0f0f0; /* เพิ่มสีพื้นหลังให้ดูชัดเจน */
+    padding: 20px; /* เพิ่มระยะห่างภายใน */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+   
+  }
+  
+  .content {
+    flex: 3; /* ใช้พื้นที่ส่วนขวา 2/3 */
+    padding: 20px;
+    background-color: #ffffff;
+  }
+
+.Logomenu {
+    display: flex;
+    
+    
+    background-color: #f0f0f0;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-radius: 20px;
+  }
+
+  div {
+    color:black;
+  }
+
+  
