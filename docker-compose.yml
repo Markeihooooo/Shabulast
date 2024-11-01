@@ -1,23 +1,13 @@
-
-
+version: 'version'
 services:
   postgres:
     image: postgres
     container_name: postgres-db
     environment:
-      POSTGRES_USER: your_db_user          # ชื่อผู้ใช้ฐานข้อมูล
-      POSTGRES_PASSWORD: your_password     # รหัสผ่านของฐานข้อมูล
-      POSTGRES_DB: your_db_name            # ชื่อฐานข้อมูล
+      POSTGRES_USER: your_db_user
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_db_name
     ports:
       - '5432:5432'
-
-    # volumes:
-    # - ./postgres-data:/var/lib/postgresql/data
-
-    volumes:
-       - ./path\\to\\data:/var/lib/postgresql/data
-
-              # ให้คอนเทนเนอร์ restart อัตโนมัติหากหยุด
-
 volumes:
   db:
