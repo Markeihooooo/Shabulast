@@ -8,6 +8,12 @@ CREATE TABLE employees (
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO employees (Username, Password, PhoneNumber, Role)
+VALUES 
+    ('admin', '123', '0812345678', 'เจ้าของ'),
+    ('admin2', '123', '0898765432', 'พนักงานร้าน'),
+    ('admin3', '123', '0855555555', 'คนทำอาหาร');
+
 -- Create table for Tables
 CREATE TABLE tables (
     TableID SERIAL PRIMARY KEY,
@@ -24,6 +30,9 @@ CREATE TABLE food_categories (
     CreatedBy INTEGER REFERENCES employees(EmployeeID),
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
 
 -- Create table for Foods
 CREATE TABLE foods (
