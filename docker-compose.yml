@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   postgres:
@@ -10,6 +10,9 @@ services:
       POSTGRES_DB: your_db_name            # ชื่อฐานข้อมูล
     ports:
       - '5432:5432'
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+    # volumes:
+    # - ./postgres-data:/var/lib/postgresql/data
               # ให้คอนเทนเนอร์ restart อัตโนมัติหากหยุด
+
+volumes:
+  db:
