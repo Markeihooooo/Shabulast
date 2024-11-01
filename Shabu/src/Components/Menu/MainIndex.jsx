@@ -14,7 +14,6 @@ import { Checkrole } from './MainindexJs.js';
   
     const goToLogout = () => {
       localStorage.removeItem('token'); // ลบ token ออกจาก localStorage
-      
       window.location.href = '/'; // เปลี่ยนเส้นทางไปยังหน้า Login
     };
     
@@ -72,6 +71,13 @@ import { Checkrole } from './MainindexJs.js';
                             toggleHistory={toggleHistory}  
                             goToLogout={goToLogout}
                         />
+                    )}
+                    {Role === 'คนทำอาหาร'&&(
+
+                      <Menu
+                      toggleHistory={toggleHistory}  
+                      goToLogout={goToLogout}
+                      />
                     )}
                 </div>
         

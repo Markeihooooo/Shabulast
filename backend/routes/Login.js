@@ -28,6 +28,8 @@ router.get('/employees', async (req, res) => {
   }
 });
 
+
+//เพิ่มโทเคน  and 
 router.post('/create',async(req,res)=>{
   const {username,password,phonenumber,role}=req.body;
   if (!username,!password,!phonenumber,!role) {
@@ -93,8 +95,10 @@ router.post ('/login',async (req,res)=>{
   }
   try{
     const result = await pool.query('SELECT * FROM public."employees" WHERE username = $1',[username]);
+    
     if (result.rows.length === 0){
       return res.status(404).json({error:"ไม่พบพนักงาน"});}
+      
       const user = result.rows[0];
       const passwordMatch = await bcrypt.compare(password,user.password);
       if (!passwordMatch){

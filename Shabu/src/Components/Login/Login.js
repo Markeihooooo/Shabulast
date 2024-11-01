@@ -33,7 +33,7 @@ export const submitLogin = async (username,password)=>{
                 confirmButtonText: 'ตกลง'
               }).then(() => {
                   localStorage.setItem('token',data.token);
-                  localStorage.setItem('role',data.role);
+                  
                   window.location.href = '/Mainmenu';
 
                   if(data.role === 'เจ้าของ')

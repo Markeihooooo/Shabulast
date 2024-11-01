@@ -72,3 +72,4 @@ CREATE TABLE payment_status (
     TotalAmount DECIMAL(10,2) NOT NULL,
     PaymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+

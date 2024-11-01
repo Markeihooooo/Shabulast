@@ -11,3 +11,7 @@ const pool = new Pool({
 });
 
 module.exports = pool; // ส่งออก pool
+
+//POSTGRES_USER: your_db_user
+// POSTGRES_PASSWORD: your_password
+// POSTGRES_DB: your_db_name

@@ -1,4 +1,5 @@
 version: 'version'
+
 services:
   postgres:
     image: postgres
