@@ -15,10 +15,6 @@ function App() {
     localStorage.setItem('token', token); // เก็บ token ใน localStorage
     setIsLoggedin(true); // อัปเดตสถานะล็อกอิน
   };
-
-  
-
-
   const isAuthenticated = () => {
     return localStorage.getItem('token') !== null; // ตรวจสอบ token
   };
@@ -32,8 +28,13 @@ function App() {
               path="/"
               element={isAuthenticated() ? <Navigate to="/Mainmenu" /> : <Login handleLogin={handleLogin} />}
             />
+            <Route path="/Mainmenu" 
+            element={isAuthenticated() ? <MainIndex /> : <Navigate to="/" />}
+            />
+
+
             <Route path="/register" element={<Register />} />
-            <Route path="/Mainmenu" element={<MainIndex  />} />
+            
             <Route path="/Menu" element={<Menu  />} />
             <Route path="/Order" element={<Order />} />
             <Route path="/Customer" element={<Customer />} />

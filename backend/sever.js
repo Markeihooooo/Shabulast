@@ -9,19 +9,12 @@ dotenv.config();
 const app = express();
 
 // ตั้งค่า CORS ที่นี่
-app.use(cors({ origin: 'http://localhost:5173' }));
+  
 
 // Middleware
 app.use(express.json());
 
 // PostgreSQL Database Connection
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: 'localhost',
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: 5432,
-});
 
 // ตัวอย่าง Route
 app.get('/', (req, res) => {

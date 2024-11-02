@@ -29,12 +29,10 @@ const Register = () => {
   return (
     <>
     <div className='container'>
+     
+      
       <div>
-      <div>
-        <input onClick={goToMain} className='back' type="submit" value={"<"} />
-      </div>
-      <div>
-        <img
+        <img className='mx-auto'
           src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png"
           alt="Logo"
         />
@@ -55,6 +53,7 @@ const Register = () => {
             <option value="" disabled>กรุณาเลือกตำแหน่ง</option>
             <option value="พนักงานร้าน">พนักงานร้าน</option>
             <option value="คนทำอาหาร">คนทำอาหาร</option>
+           
             
           </select>
           </div>
@@ -62,7 +61,7 @@ const Register = () => {
       </div>
       
       </div>
-    </div>
+    
     </>
   )
 }
