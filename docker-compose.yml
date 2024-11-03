@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: your_db_user       # ชื่อผู้ใช้
       POSTGRES_PASSWORD: your_password  # รหัสผ่าน
-      POSTGRES_DB: your_db_name         # ชื่อฐานข้อมูล
+      POSTGRES_DB: your_db_name         # ชื่อฐานข้อมูลd
     ports:
       - "5432:5432"
   
