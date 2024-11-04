@@ -20,7 +20,7 @@ const Order = () => {
 
   // ตัวอย่างข้อมูลคำสั่งซื้อ
   const orders = [
-    { table: 1, id: 101, items: ['Pizza', 'Salad'], status: 'Pending' },
+    { table: 1, id: 101, items: ['Pizza5555', 'Salad'], status: 'Pending' },
     { table: 1, id: 102, items: ['Pasta', 'Drink'], status: 'Confirmed' },
     { table: 1, id: 103, items: ['Burger', 'Fries'], status: 'Completed' },
     { table: 2, id: 104, items: ['Pizza', 'Salad'], status: 'Pending' },
