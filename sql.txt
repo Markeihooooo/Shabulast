@@ -1,80 +1,144 @@
--- Create table for Employees
-CREATE TABLE employees (
-    EmployeeID SERIAL PRIMARY KEY,
-    Username VARCHAR(255) NOT NULL,
-    Password VARCHAR(255) NOT NULL,
-    PhoneNumber VARCHAR(15),
-    Role VARCHAR(50) NOT NULL CHECK (Role IN ('เจ้าของ', 'พนักงานร้าน', 'คนทำอาหาร')),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ตาราง Employee
+CREATE TABLE Employee (
+    emp_ID SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(15),
+    role VARCHAR(20) CHECK (role IN ('เจ้าของ', 'พนักงาน', 'คนทำอาหาร')) NOT NULL
 );
 
-
-
--- Create table for Tables
-CREATE TABLE tables (
-    TableID SERIAL PRIMARY KEY,
-    Number VARCHAR(50) NOT NULL,
-    Status VARCHAR(50) CHECK (Status IN ('ว่าง', 'ไม่ว่าง')),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ตาราง Category
+CREATE TABLE Category (
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL,
+    status BOOLEAN DEFAULT TRUE,
+    create_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
+    update_at TIMESTAMP
 );
 
--- Create table for Food Categories
-CREATE TABLE food_categories (
-    CategoryID SERIAL PRIMARY KEY,
-    CategoryName VARCHAR(255) NOT NULL,
-    Description TEXT,
-    CreatedBy INTEGER REFERENCES employees(EmployeeID),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ตาราง Category_item
+CREATE TABLE Category_item (
+    category_item_id SERIAL PRIMARY KEY,
+    category_item_name VARCHAR(100) NOT NULL,
+    category_item_balance INT DEFAULT 0,
+    category_id INT REFERENCES Category(category_id) ON DELETE CASCADE,
+    create_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
+    update_at TIMESTAMP
 );
 
-
-
-
--- Create table for Foods
-CREATE TABLE foods (
-    FoodID SERIAL PRIMARY KEY,
-    FoodName VARCHAR(255) NOT NULL,
-    CategoryID INTEGER REFERENCES food_categories(CategoryID),
-    Price DECIMAL(10,2) NOT NULL,
-    ImageURL VARCHAR(255),
-    Status VARCHAR(10) CHECK (Status IN ('มี', 'ไม่มี')),
-    CreatedBy INTEGER REFERENCES employees(EmployeeID),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ตาราง Order (เปลี่ยนชื่อเป็น OrderInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
+CREATE TABLE OrderInfo (
+    order_id SERIAL PRIMARY KEY,
+    status VARCHAR(50) NOT NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create table for Customers
-CREATE TABLE customers (
-    CustomerID SERIAL PRIMARY KEY,
-    TableID INTEGER REFERENCES tables(TableID),
-    NumberOfPeople INTEGER NOT NULL,
-    QRCode VARCHAR(255) NOT NULL,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ตาราง Table (เปลี่ยนชื่อเป็น TableInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
+CREATE TABLE TableInfo (
+    table_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id INT REFERENCES OrderInfo(order_id) ON DELETE SET NULL
 );
 
--- Create table for Orders
-CREATE TABLE orders (
-    OrderID SERIAL PRIMARY KEY,
-    CustomerID INTEGER REFERENCES customers(CustomerID),
-    OrderStatus VARCHAR(50) CHECK (OrderStatus IN ('รอตำเนินการ', 'กำลังเตรียม', 'เสิร์จสิ้น')),
-    CreatedBy INTEGER REFERENCES employees(EmployeeID),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ตาราง Bill
+CREATE TABLE Bill (
+    bill_id SERIAL PRIMARY KEY,
+    customer_count INT,
+    table_id UUID REFERENCES TableInfo(table_id) ON DELETE SET NULL,
+    payment_status BOOLEAN DEFAULT FALSE,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
+    update_at TIMESTAMP,
+    update_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
+    checkout TIMESTAMP
 );
 
--- Create table for Order Details
-CREATE TABLE order_details (
-    OrderDetailID SERIAL PRIMARY KEY,
-    OrderID INTEGER REFERENCES orders(OrderID),
-    FoodID INTEGER REFERENCES foods(FoodID),
-    Quantity INTEGER NOT NULL,
-    SubTotal DECIMAL(10,2) NOT NULL
+-- ตาราง Order_item
+CREATE TABLE Order_item (
+    order_item_id SERIAL PRIMARY KEY,
+    category_item_id INT REFERENCES Category_item(category_item_id) ON DELETE CASCADE,
+    quantity INT NOT NULL,
+    order_id INT REFERENCES OrderInfo(order_id) ON DELETE CASCADE
 );
 
--- Create table for Payment Status
-CREATE TABLE payment_status (
-    PaymentID SERIAL PRIMARY KEY,
-    OrderID INTEGER REFERENCES orders(OrderID),
-    PaidBy INTEGER REFERENCES employees(EmployeeID),
-    TotalAmount DECIMAL(10,2) NOT NULL,
-    PaymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง Employee
+INSERT INTO Employee (username, password, phone_number, role) VALUES 
+('owner', 'ownerpass', '0123456789', 'เจ้าของ'),
+('employee1', 'employeepass1', '0987654321', 'พนักงาน'),
+('cook', 'cookpass', NULL, 'คนทำอาหาร');
 
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง Category
+INSERT INTO Category (category_name, status, create_by, create_at) VALUES
+('Food', TRUE, 1, CURRENT_TIMESTAMP),
+('Drinks', TRUE, 2, CURRENT_TIMESTAMP);
+
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง Category_item
+INSERT INTO Category_item (category_item_name, category_item_balance, category_id, create_by, create_at) VALUES
+('Pasta', 20, 1, 1, CURRENT_TIMESTAMP),
+('Coffee', 30, 2, 2, CURRENT_TIMESTAMP);
+
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง TableInfo
+INSERT INTO TableInfo (order_id) VALUES (NULL);
+
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง OrderInfo
+INSERT INTO OrderInfo (status, create_at) VALUES
+('Pending', CURRENT_TIMESTAMP),
+('Completed', CURRENT_TIMESTAMP);
+
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง Bill
+INSERT INTO Bill (customer_count, table_id, payment_status, create_at, create_by, checkout) VALUES
+(2, (SELECT table_id FROM TableInfo LIMIT 1), FALSE, CURRENT_TIMESTAMP, 1, NULL);
+
+-- สร้างข้อมูลตัวอย่างสำหรับตาราง Order_item
+INSERT INTO Order_item (category_item_id, quantity, order_id) VALUES
+(1, 2, 1),
+(2, 1, 1);
+
+
+
+
+SELECT 
+    Bill.bill_id,
+    Bill.customer_count,
+    Bill.payment_status,
+    Bill.create_at AS bill_create_at,
+    Bill.checkout,
+    
+    Employee.username AS created_by,
+    TableInfo.table_id,
+    
+    OrderInfo.order_id,
+    OrderInfo.status AS order_status,
+    OrderInfo.create_at AS order_create_at,
+    
+    Order_item.order_item_id,
+    Order_item.quantity,
+    
+    Category_item.category_item_name,
+    Category_item.category_item_balance,
+    
+    Category.category_name
+FROM Bill
+-- Join กับตาราง TableInfo เพื่อนำ table_id ของบิลมาแสดง
+LEFT JOIN TableInfo ON Bill.table_id = TableInfo.table_id
+
+-- Join กับตาราง Employee เพื่อนำชื่อของผู้สร้างบิลมาแสดง
+LEFT JOIN Employee ON Bill.create_by = Employee.emp_ID
+
+-- Join กับตาราง OrderInfo เพื่อดึง order_id และสถานะคำสั่งซื้อที่เกี่ยวข้องกับบิล
+LEFT JOIN OrderInfo ON TableInfo.order_id = OrderInfo.order_id
+
+-- Join กับตาราง Order_item เพื่อนำข้อมูลของแต่ละรายการสินค้าในคำสั่งซื้อมาแสดง
+LEFT JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
+
+-- Join กับตาราง Category_item เพื่อนำชื่อสินค้าหมวดหมู่ และจำนวนสินค้าที่เหลือในสต็อกมาแสดง
+LEFT JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id
+
+-- Join กับตาราง Category เพื่อดึงชื่อหมวดหมู่สินค้าที่อยู่ในบิล
+LEFT JOIN Category ON Category_item.category_id = Category.category_id
+
+-- กำหนดเงื่อนไขการเลือกบิลที่ต้องการ (เปลี่ยนค่า 1 เป็นค่า bill_id ที่ต้องการตรวจสอบ)
+WHERE Bill.bill_id = 1;
