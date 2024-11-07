@@ -1,0 +1,102 @@
+/* Customer.css */
+
+/* Layout */
+.menu-container {
+  display: flex;
+}
+
+.category-sidebar {
+  width: 200px;
+  background-color: #ffe6e6;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-btn {
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #ff7f7f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.category-btn.active {
+  background-color: #ff4d4d;
+}
+
+.menu {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff5f5;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ffd1d1;
+  border-radius: 5px;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-btn {
+  background-color: transparent;
+  color: #ff4d4d;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px;
+}
+
+.confirm-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cart {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  background-color: #fff5f5;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
+
+.cart.open {
+  right: 0;
+}
+
+.checkout-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.payment, .thank-you {
+  text-align: center;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #fff5f5;
+}
