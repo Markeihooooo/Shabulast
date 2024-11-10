@@ -1,4 +1,3 @@
-// CustomerPage.js
 import React, { useState } from 'react';
 import './Customer.css';
 
@@ -7,6 +6,12 @@ const CustomerPage = () => {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState("menu");
+  const [showThankYouPopup, setShowThankYouPopup] = useState(false);
+  const [showOrderSuccessPopup, setShowOrderSuccessPopup] = useState(false);
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [tableNumber, setTableNumber] = useState("A1");
+  const [paymentRequest, setPaymentRequest] = useState(false);
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false); // ป๊อปอัปการเรียกพนักงาน
 
   const categories = ["เนื้อสัตว์", "อาหารทะเล", "ผัก", "ของทานเล่น", "อื่นๆ", "เครื่องดื่ม"];
   const items = [
@@ -53,12 +58,37 @@ const CustomerPage = () => {
   const decreaseQuantity = (item) => updateCart(item, -1);
 
   const handleCheckout = () => {
-    setCurrentPage("checkout");
+    setShowOrderSuccessPopup(true);
     setIsCartOpen(false);
   };
 
   const handlePayment = () => {
-    setCurrentPage("thankYou");
+    setShowPaymentPopup(true);
+  };
+
+  const closeThankYouPopup = () => {
+    setShowThankYouPopup(false);
+    setShowPaymentPopup(true);
+  };
+
+  const closeOrderSuccessPopup = () => {
+    setShowOrderSuccessPopup(false);
+    setShowPaymentPopup(true);
+  };
+
+  const handleCallStaff = () => {
+    setPaymentRequest(true);
+    setShowConfirmationPopup(true); // เปิดป๊อปอัปการเรียกพนักงาน
+  };
+
+  const closeConfirmationPopup = () => {
+    setShowConfirmationPopup(false);
+    setShowPaymentPopup(false); // ปิดป๊อปอัปการชำระเงินเมื่อเรียกพนักงานสำเร็จ
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    return `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
   };
 
   return (
@@ -103,22 +133,55 @@ const CustomerPage = () => {
             </div>
           </div>
         ))}
-        <button onClick={handleCheckout} className="checkout-btn">ชำระเงิน</button>
+        <button onClick={handleCheckout} className="checkout-btn">สั่งอาหาร</button>
         <button onClick={() => setIsCartOpen(false)} className="close-cart-btn">ปิด</button>
       </div>
 
-      {currentPage === "checkout" && (
-        <div className="payment">
-          <h2>ชำระเงิน</h2>
-          <button onClick={handlePayment} className="call-staff-btn">เรียกพนักงานเพื่อชำระเงิน</button>
-          <button onClick={() => setCurrentPage("menu")} className="back-btn">กลับไปยังเมนู</button>
+      {showOrderSuccessPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <h2>สั่งอาหารสำเร็จ!</h2>
+            <p>คุณได้ทำการสั่งอาหารเรียบร้อยแล้ว</p>
+            <button onClick={closeOrderSuccessPopup} className="close-popup-btn">ปิด</button>
+          </div>
         </div>
       )}
 
-      {currentPage === "thankYou" && (
-        <div className="thank-you">
-          <h2>ขอบคุณ!</h2>
-          <p>ขอบคุณที่ใช้บริการร้านของเรา!</p>
+      {showThankYouPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <h2>ขอบคุณ!</h2>
+            <p>ขอบคุณที่ใช้บริการร้านของเรา!</p>
+            <button onClick={closeThankYouPopup} className="close-popup-btn">ปิด</button>
+          </div>
+        </div>
+      )}
+
+      {/* ป๊อปอัปการเรียกพนักงาน */}
+      {showConfirmationPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <div className="confirmation-header">
+              <p>ขอบคุณที่ใช้บริการ</p>
+            </div>
+            <h2>เรียกพนักงานสำเร็จแล้ว</h2>
+            <button onClick={closeConfirmationPopup} className="close-popup-btn">ยืนยัน</button>
+          </div>
+        </div>
+      )}
+
+      {/* ป๊อปอัปชำระเงิน ขนาดใหญ่ */}
+      {showPaymentPopup && (
+        <div className="popup large-popup">
+          <div className="popup-content large-popup-content">
+            <h2>ชำระเงิน</h2>
+            <p>หมายเลขโต๊ะ: {tableNumber}</p>
+            <p>วันที่และเวลา: {getCurrentDateTime()}</p>
+            <button onClick={handleCallStaff} className="call-staff-btn">
+              เรียกพนักงานเพื่อชำระเงิน
+            </button>
+            {paymentRequest && <p>พนักงานกำลังเดินทางมา</p>}
+          </div>
         </div>
       )}
     </div>
