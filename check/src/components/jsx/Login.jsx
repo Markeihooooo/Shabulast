@@ -9,6 +9,7 @@ const Login = () => {
   const goToRegister = useGoToRegister();
   const navigate = useNavigate();
 
+  
   const goToLogin=()=>{
     navigate('/');
   }
@@ -48,7 +49,8 @@ const Login = () => {
         </div>
       </form>
       <div>
-        <input onClick={goToRegister} type="submit" value="Register" />
+        <input onClick={goToRegister}  type="submit" value="Register" 
+        />
       </div>
     </div>
   );
