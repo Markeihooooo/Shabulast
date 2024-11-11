@@ -79,11 +79,11 @@ const CustomerPage = () => {
   const handleCallStaff = () => {
     setPaymentRequest(true);
     setShowConfirmationPopup(true); // เปิดป๊อปอัปการเรียกพนักงาน
+    setShowPaymentPopup(false); // ปิดป๊อปอัปการชำระเงิน
   };
 
   const closeConfirmationPopup = () => {
     setShowConfirmationPopup(false);
-    setShowPaymentPopup(false); // ปิดป๊อปอัปการชำระเงินเมื่อเรียกพนักงานสำเร็จ
   };
 
   const getCurrentDateTime = () => {
