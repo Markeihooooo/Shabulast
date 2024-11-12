@@ -11,6 +11,8 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+// ใช้ CORS middleware
+app.use(cors());
 
 // ตัวอย่าง Route
 app.get('/', (req, res) => {
@@ -18,6 +20,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/login', LoginRouter);
+
+
 
 // ใช้ route ที่เชื่อมโยงกับ /order-details
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes

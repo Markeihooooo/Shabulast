@@ -11,14 +11,15 @@ router.get('/pending-orders', async (req, res) => {
                 OrderInfo.order_id,
                 OrderInfo.create_at AS order_create_at,
                 TableInfo.table_id,
+                TableInfo.table_name, -- เพิ่ม table_name
                 Order_item.order_item_id,
                 Order_item.quantity,
                 Category_item.category_item_name
             FROM OrderInfo
             JOIN TableInfo ON OrderInfo.order_id = TableInfo.order_id
             JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
-            JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id
-            WHERE OrderInfo.status != 'Completed';
+            JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id;
+            
         `;
         const { rows } = await pool.query(query);
         res.json(rows);
