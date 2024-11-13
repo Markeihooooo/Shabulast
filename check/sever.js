@@ -105,7 +105,7 @@ app.get('/order-details/pending-orders', (req, res) => {
   const table_name = req.query.table_name;
 
   // ดึงข้อมูลคำสั่งซื้อจากฐานข้อมูล PostgreSQL
-  const query = 'SELECT order_id, order_create_at, table_name, order_item_id, category_item_name, quantity, status FROM orders WHERE table_name = $1';
+  const query = 'SELECT order_id, order_create_at, table_name, order_item_id, category_item_name, quantity, order_status FROM orders WHERE table_name = $1';
   
   client.query(query, [table_name]) // $1 คือการใช้ parameterized query เพื่อหลีกเลี่ยง SQL injection
     .then(result => {
@@ -116,7 +116,6 @@ app.get('/order-details/pending-orders', (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
-
 
 // เริ่มต้นเซิร์ฟเวอร์ที่พอร์ต 3001
 app.listen(3001, () => {
