@@ -47,7 +47,6 @@ router.post('/create', async (req, res) => {
     if (!category_name) {
         return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบ' });
     }
-
     try {
         // รับ token จาก header Authorization
         const token = req.header('Authorization')?.replace('Bearer ', '');

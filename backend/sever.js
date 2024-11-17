@@ -5,6 +5,7 @@ const { Pool } = require('pg');
 const LoginRouter = require('./routes/Login');
 const orderRoutes = require('./routes/Order');  // นำเข้า orderRoutes จากไฟล์ Order.js
 const CategoryRouter = require('./routes/Category');
+const ItemCategoryRouter = require('./routes/ItemCategory');
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use('/login', LoginRouter);
 // ใช้ route ที่เชื่อมโยงกับ /order-details
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
 app.use('/category',CategoryRouter);
+app.use('/itemCategory',ItemCategoryRouter);
 
 
 // เริ่มเซิร์ฟเวอร์
