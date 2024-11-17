@@ -11,7 +11,7 @@ CREATE TABLE Employee (
 CREATE TABLE Category (
     category_id SERIAL PRIMARY KEY,
     category_name VARCHAR(100) NOT NULL,
-    status BOOLEAN DEFAULT TRUE,
+    is_active BOOLEAN DEFAULT TRUE,     -----------------------------------------change status to is_active
     create_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,

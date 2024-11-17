@@ -91,7 +91,7 @@ router.post('/create', async (req, res) => {
 // กำหนดเส้นทาง (route) สำหรับรับคำขอ HTTP แบบ PATCH ที่ endpoint '/update/:id'
 // โดย :id เป็นตัวแปรที่รับค่า id ของหมวดหมู่ที่ต้องการอัปเดต
 router.patch('/update/:id', async (req, res) => {
-    const { category_name } = req.body; // รับค่า category_name จาก body
+    const { category_name, is_active } = req.body; // รับค่า category_name จาก body
 
     // ตรวจสอบว่า category_name ถูกส่งมาหรือไม่
     if (!category_name) {
@@ -128,10 +128,13 @@ router.patch('/update/:id', async (req, res) => {
             return res.status(404).json({ error: 'หมวดหมู่นี้ไม่พบในฐานข้อมูล' });
         }
 
-        // อัปเดตข้อมูลหมวดหมู่
+        // แปลง is_active เป็น boolean ถ้าเป็น string
+        const activeStatus = is_active === "true" ? true : is_active === "false" ? false : is_active;
+
+        // อัปเดตข้อมูลหมวดหมู่ พร้อมกับค่า status
         const result = await pool.query(
-            'UPDATE public."category" SET category_name = $1, update_by = $2, update_at = CURRENT_TIMESTAMP WHERE category_id = $3 RETURNING *',
-            [category_name, emp_ID, id]
+            'UPDATE public."category" SET category_name = $1, update_by = $2, update_at = CURRENT_TIMESTAMP, is_active = $3 WHERE category_id = $4 RETURNING *',
+            [category_name, emp_ID, activeStatus, id]
         );
 
         res.status(200).json({ message: 'อัพเดทรายการหมวดหมู่สำเร็จ', category: result.rows[0] });
