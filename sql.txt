@@ -23,6 +23,7 @@ CREATE TABLE Category_item (
     category_item_id SERIAL PRIMARY KEY,
     category_item_name VARCHAR(100) NOT NULL,
     category_item_balance INT DEFAULT 0,
+    image_url VARCHAR(255) NOT NULL,            ------------------------------------------------------add
     category_id INT REFERENCES Category(category_id) ON DELETE CASCADE,
     create_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

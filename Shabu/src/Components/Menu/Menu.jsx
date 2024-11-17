@@ -3,7 +3,7 @@ import React from 'react';
 import { Checkrole } from './MainindexJs.js';
 import { useEffect, useState } from 'react';
 const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor 
-  ,togglePayment ,toggleHistory ,goToLogout
+  ,togglePayment ,toggleHistory ,goToLogout,toggleItemsInCategory
 }) => { // รับ props toggleRegister
   
   const goToOrder = () => {
@@ -33,7 +33,7 @@ const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor
           alt="Logo"
           className='mx-auto'
         />
-        <input type='sumbit'  />
+       
         <input type='submit' onClick={goToOrder} value='ดูรายการสั่งอาหาร' />
         {Role === 'เจ้าของ' && (
         <>
@@ -44,6 +44,7 @@ const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor
         <input type='submit' onClick={togglePayment} value='ชำระเงินลูกค้า' />
         <input type='submit' onClick={toggleHistory} value='ประวัติรายการสั่ง' />
         <input type='submit' value='สมัครสมาชิก' onClick={toggleRegister} />    
+        <input type='submit' onClick={toggleItemsInCategory} value='รายการเมนู' />
         </>
         )}
         {Role === 'พนักงานร้าน'&&(

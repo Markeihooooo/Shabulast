@@ -4,10 +4,21 @@ const dotenv = require('dotenv');
 const pool = require('./db'); // นำเข้า Pool จาก db.js
 const LoginRouter = require('./routes/Login');
 const orderRoutes = require('./routes/Order');  // นำเข้า orderRoutes จากไฟล์ Order.js
+const CategoryRouter = require('./routes/Category');
+const ItemCategoryRouter = require('./routes/ItemCategory');
 
 dotenv.config();
 
 const app = express();
+
+// ใช้ cors ในทุกคำขอ
+app.use(cors());
+
+// หรือถ้าคุณต้องการกำหนด CORS เฉพาะ เช่น ให้อนุญาตแค่บางโดเมน
+app.use(cors({
+  origin: 'http://localhost:5173',  // กำหนดให้อนุญาตเฉพาะจาก frontend ที่รันที่ 5173
+}));
+
 
 // Middleware
 app.use(express.json());
@@ -23,6 +34,9 @@ app.use('/login', LoginRouter);
 
 // ใช้ route ที่เชื่อมโยงกับ /order-details
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
+app.use('/category',CategoryRouter);
+app.use('/itemCategory',ItemCategoryRouter);
+
 
 // เริ่มเซิร์ฟเวอร์
 app.listen(3001, () => {
