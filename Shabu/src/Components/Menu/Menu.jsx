@@ -33,7 +33,7 @@ const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor
           alt="Logo"
           className='mx-auto'
         />
-        <input type='sumbit'  />
+       
         <input type='submit' onClick={goToOrder} value='ดูรายการสั่งอาหาร' />
         {Role === 'เจ้าของ' && (
         <>
