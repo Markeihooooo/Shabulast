@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { Pool } = require('pg');
+const pool = require('./db'); // นำเข้า Pool จาก db.js
 const LoginRouter = require('./routes/Login');
 const orderRoutes = require('./routes/Order');  // นำเข้า orderRoutes จากไฟล์ Order.js
 const CategoryRouter = require('./routes/Category');
@@ -22,6 +22,8 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
+// ใช้ CORS middleware
+app.use(cors());
 
 // ตัวอย่าง Route
 app.get('/', (req, res) => {

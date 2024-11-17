@@ -1,8 +1,10 @@
+/* สไตล์สำหรับ container หลัก */
 .order__main-container {
     display: flex;
     height: 100vh;
 }
 
+/* Sidebar */
 .order__sidebar {
     flex: 1;
     background-color: #f0f0f0;
@@ -12,6 +14,7 @@
     align-items: center;
 }
 
+/* Icon container ใน sidebar */
 .order__icon-container {
     margin: 20px 0;
 }
@@ -21,12 +24,14 @@
     border-radius: 50%;
 }
 
+/* Table list ใน sidebar */
 .order__table-list {
     list-style-type: none;
     padding: 0;
     width: 100%;
 }
 
+/* Table item ใน sidebar */
 .order__table-item {
     cursor: pointer;
     padding: 10px;
@@ -36,10 +41,12 @@
     text-align: center;
 }
 
+/* สไตล์เมื่อมีการเลือก table */
 .order__table-item.active {
     background-color: #ddd;
 }
 
+/* Content area */
 .order__content {
     flex: 3;
     padding: 20px;
@@ -48,6 +55,7 @@
     flex-direction: column;
 }
 
+/* Slidebar ใน content */
 .order__slidebar {
     background-color: red;
     padding: 20px;
@@ -60,6 +68,7 @@
     color: white;
 }
 
+/* Mainbar สำหรับรายการคำสั่งซื้อ */
 .order__mainbar {
     background-color: lightgray;
     padding: 20px;
@@ -70,9 +79,24 @@
     align-items: flex-start;
 }
 
+/* รายการคำสั่งซื้อ */
+.order__item {
+    border: 1px solid #ccc;
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Hover effect สำหรับ item */
+.order__item:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+/* สไตล์ของปุ่มทั่วไป */
 button {
-    width: 100%;
-    padding: 10px;
+    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     background-color: #007bff;
@@ -82,25 +106,48 @@ button {
     margin: 10px 0;
 }
 
+/* Hover effect สำหรับปุ่ม */
 button:hover {
     background-color: blue;
 }
 
-.order__item {
-    display: flex;
-    flex-direction: column;
-    background-color: yellow;
-    width: 30%;
-    min-width: 200px;
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Active effect เมื่อคลิกปุ่ม */
+button:active {
+    background-color: darkblue;
 }
 
-.order__item:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
+/* Disabled state สำหรับปุ่ม */
+button:disabled {
+    background-color: #bdbdbd;
+    cursor: not-allowed;
+}
+
+/* สไตล์เฉพาะสำหรับปุ่ม "เปลี่ยนสถานะ" */
+.update-status-button {
+    background-color: #4CAF50; /* สีพื้นหลังเขียว */
+    color: white; /* สีตัวอักษร */
+    border: none; /* ไม่มีขอบ */
+    padding: 10px 20px; /* การเว้นระยะภายในปุ่ม */
+    font-size: 16px; /* ขนาดตัวอักษร */
+    cursor: pointer; /* เปลี่ยนเคอร์เซอร์เป็นมือเมื่อชี้ไปที่ปุ่ม */
+    border-radius: 5px; /* มุมปุ่มโค้ง */
+    transition: background-color 0.3s ease; /* การเปลี่ยนสีพื้นหลังเมื่อมีการโต้ตอบ */
+    width: auto; /* ความกว้างของปุ่มตามขนาดของเนื้อหา */
+    margin-top: 10px; /* ระยะห่างด้านบน */
+}
+
+/* เปลี่ยนสีพื้นหลังเมื่อชี้ไปที่ปุ่ม */
+.update-status-button:hover {
+    background-color: #45a049; /* สีพื้นหลังเข้มขึ้นเมื่อชี้ */
+}
+
+/* เปลี่ยนสีพื้นหลังเมื่อคลิกปุ่ม */
+.update-status-button:active {
+    background-color: #388e3c; /* สีพื้นหลังเข้มขึ้นเมื่อคลิก */
+}
+
+/* สไตล์เมื่อปุ่มถูกปิดการใช้งาน */
+.update-status-button:disabled {
+    background-color: #bdbdbd; /* สีพื้นหลังเมื่อปุ่มถูกปิดการใช้งาน */
+    cursor: not-allowed; /* เปลี่ยนเคอร์เซอร์เป็นปกติเมื่อปิดการใช้งาน */
 }
