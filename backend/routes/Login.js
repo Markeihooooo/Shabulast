@@ -89,6 +89,7 @@ router.post('/create',async(req,res)=>{
   router.post ('/login',async (req,res)=>{
     const {username,password}=req.body;
   
+
     if (!username || !password){
       return res.status(400).json({error:"กรุณากรอกข้อมูลให้ครบ"});
     }
@@ -112,18 +113,32 @@ router.post('/create',async(req,res)=>{
   })
 
 
+
 // ดึกข้อมูล role
 
  router.get('/role/:token', async (req, res) => {
    try{
     const token = req.params.token;
     const decode = await jwt.verify(token, secret);
-    const username = decode.username;
+
     const role = decode.role;
-    res.status(200).json({ role, username });
+    res.status(200).json({ role});
 }catch(error){
   console.error('Error fetching role:', error);
   res.status(500).json({ error: 'Internal Server Error' });
 }}
 )
+
+router.get('/username/:token', async (req, res) => {
+  try{
+   const token = req.params.token;
+   const decode = await jwt.verify(token, secret);
+ 
+   const username = decode.username;
+   res.status(200).json({ username});
+}catch(error){
+ console.error('Error fetching username:', error);
+ res.status(500).json({ error: 'Internal Server Error' });
+}})
+
 module.exports = router;
