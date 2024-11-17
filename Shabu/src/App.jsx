@@ -7,7 +7,7 @@ import Menu from './Components/Menu/Menu.jsx';
 import MainIndex from './Components/Menu/MainIndex.jsx';
 import Order from './Components/Order/Order.jsx';
 import Customer from './Components/Customer/Customer.jsx';
-// import ItemsInCategory from './Components/Menu/SetItemIncategory.jsx';
+import SetItemIncategory from './Components/Menu/SetItemIncategory.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedin] = useState(false); // สถานะล็อคอิน
@@ -40,7 +40,7 @@ function App() {
             <Route path="/Order" element={<Order />} />
             <Route path="/Customer" element={<Customer />} />
 
-            {/* <Route path="/itemsCategory" element={<ItemsInCategory />} /> */}
+            <Route path="/itemsCategory" element={<SetItemIncategory />} />
 
           </Routes>
         </main>
