@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { Pool } = require('pg');
+const pool = require('./db'); // นำเข้า Pool จาก db.js
 const LoginRouter = require('./routes/Login');
 const orderRoutes = require('./routes/Order');  // นำเข้า orderRoutes จากไฟล์ Order.js
 
@@ -20,8 +20,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/login', LoginRouter);
-
-
 
 // ใช้ route ที่เชื่อมโยงกับ /order-details
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
