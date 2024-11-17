@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const itemsInCategory = () => {
+const SetItemIncategory = () => {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [items, setItems] = useState([]);
@@ -103,4 +103,5 @@ const itemsInCategory = () => {
     );
 };
 
-export default itemsInCategory;
+export default SetItemIncategory;
+
