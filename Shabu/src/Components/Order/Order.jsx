@@ -58,13 +58,12 @@ const OrderPage = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    status: 'Completed',
+                    status: 'Completed', // ตั้งสถานะเป็น Completed
                 }),
             });
 
             if (response.ok) {
-                // หลังจากอัปเดตสถานะแล้ว ให้โหลดข้อมูลใหม่
-                fetchOrderData();
+                fetchOrderData(); // โหลดข้อมูลใหม่หลังการเปลี่ยนสถานะ
             } else {
                 throw new Error("Failed to update order status");
             }
@@ -72,6 +71,31 @@ const OrderPage = () => {
             console.error("Error updating order status:", error);
         }
     };
+
+    // ฟังก์ชันสำหรับยกเลิกคำสั่งซื้อ
+    const cancelOrder = async (order_id) => {
+        try {
+            const response = await fetch(`http://localhost:3001/order-details/update-order-status/${order_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    status: 'Canceled', // ตั้งสถานะเป็น Canceled
+                }),
+            });
+
+            if (response.ok) {
+                fetchOrderData(); // โหลดข้อมูลใหม่หลังการเปลี่ยนสถานะ
+            } else {
+                throw new Error("Failed to cancel order");
+            }
+        } catch (error) {
+            console.error("Error canceling order:", error);
+        }
+    };
+
+
 
     // ดึงข้อมูลคำสั่งซื้อเมื่อโหลด component ครั้งแรก
     useEffect(() => {
@@ -102,7 +126,7 @@ const OrderPage = () => {
                                 <p><strong>รหัสคำสั่งซื้อ:</strong> {order.order_id}</p>
                                 <p><strong>เวลาสั่งซื้อ:</strong> {new Date(order.order_create_at).toLocaleString()}</p>
                                 <p><strong>สถานะ:</strong> {order.order_status}</p> {/* ใช้ order_status แทน order.status */}
-                                <p><strong>รายการ:</strong></p> 
+                                <p><strong>รายการ:</strong></p>
                                 <ul>
                                     {order.items.map((item, index) => (
                                         <li key={index}>{item.category_item_name} ({item.quantity})</li>
@@ -112,6 +136,9 @@ const OrderPage = () => {
                                 {/* ปุ่มเปลี่ยนสถานะ */}
                                 <button onClick={() => updateOrderStatus(order.order_id)} className="update-status-button">
                                     เปลี่ยนสถานะเป็น Completed
+                                </button>
+                                <button onClick={() => cancelOrder(order.order_id)} className="cancel-order-button">
+                                    ยกเลิกคำสั่งซื้อ
                                 </button>
                             </div>
                         ))
