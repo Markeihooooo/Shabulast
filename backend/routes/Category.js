@@ -9,7 +9,6 @@ const secret = "Test@4%#$6*";
 
 // กำหนดเส้นทาง (route) ในการรับคำขอ HTTP แบบ GET ที่ endpoint '/category'
 // โดยใช้ async function เพื่อรองรับการทำงานแบบ asynchronous
-// Ensure your route handler is an async function
 router.get('/get', async (req, res) => {
     const page = parseInt(req.query.page) || 1;  // Default page is 1
     const itemsPerPage = 10;  // Items per page
@@ -37,7 +36,6 @@ router.get('/get', async (req, res) => {
     }
 });
 
-
 // กำหนดเส้นทาง (route) ในการรับคำขอ HTTP แบบ POST ที่ endpoint '/category'
 // โดยใช้ async function เพื่อรองรับการทำงานแบบ asynchronous
 router.post('/create', async (req, res) => {
@@ -51,7 +49,7 @@ router.post('/create', async (req, res) => {
     try {
         // รับค่า token จาก header Authorization
         const token = req.header('Authorization')?.replace('Bearer ', '');
-        
+
         if (!token) {
             return res.status(401).json({ error: 'Token is missing or invalid' });
         }
@@ -80,7 +78,7 @@ router.post('/create', async (req, res) => {
         const result = await pool.query(
             'INSERT INTO public."category" (category_name, create_by) VALUES ($1, $2) RETURNING *',
             [category_name, emp_ID]
-        );        
+        );
 
         res.status(201).json({ message: 'สร้างหมวดหมู่สำเร็จ', category: result.rows[0] });
 
@@ -90,83 +88,82 @@ router.post('/create', async (req, res) => {
     }
 });
 
-
 // กำหนดเส้นทาง (route) สำหรับรับคำขอ HTTP แบบ PATCH ที่ endpoint '/update/:id'
 // โดย :id เป็นตัวแปรที่รับค่า id ของหมวดหมู่ที่ต้องการอัปเดต
 router.patch('/update/:id', async (req, res) => {
+    const { category_name } = req.body; // รับค่า category_name จาก body
+
+    // ตรวจสอบว่า category_name ถูกส่งมาหรือไม่
+    if (!category_name) {
+        return res.status(400).json({ error: 'กรุณากรอกชื่อหมวดหมู่' });
+    }
+
     try {
-        // ดึงค่า id จาก URL parameter (:id) ที่ส่งมา
-        const { id } = req.params;
+        // รับค่า token จาก header Authorization
+        const token = req.header('Authorization')?.replace('Bearer ', '');
 
-        // ดึงค่า category_name, update_by จาก body ของคำขอที่ส่งเข้ามา
-        const { category_name, update_by } = req.body;
-
-        // ตรวจสอบว่ามีค่า category_name และ update_by ถูกส่งมาในคำขอหรือไม่
-        if (!category_name) {
-            return res.status(400).json({ error: 'Category name is required' });
-        }
-        if (!update_by) {
-            return res.status(400).json({ error: 'Update by user ID is required' });
+        if (!token) {
+            return res.status(401).json({ error: 'Token is missing or invalid' });
         }
 
-        // ทำการคิวรีเพื่ออัปเดตข้อมูลในตาราง "Category" ใน schema "public"
-        // โดยอัปเดต category_name, update_by และ update_at
-        const result = await pool.query(
-            `UPDATE public."Category" 
-            SET category_name = $1, 
-                update_by = $2, 
-                update_at = CURRENT_TIMESTAMP 
-            WHERE category_id = $3 
-             RETURNING *`,
-            [category_name, update_by, id]
+        // Decode token
+        const decoded = jwt.verify(token, secret);
+        console.log('Decoded token:', decoded);
+
+        // ดึง emp_ID จาก decoded token
+        const { emp_ID } = decoded;
+        if (!emp_ID) {
+            return res.status(400).json({ error: 'Invalid token - No emp_ID found' });
+        }
+
+        const { id } = req.params; // รับค่า id จาก URL
+
+        // ตรวจสอบว่า category_id นี้มีอยู่ในฐานข้อมูลหรือไม่
+        const checkCategory = await pool.query(
+            'SELECT * FROM public."category" WHERE category_id = $1',
+            [id]
         );
 
-        // ตรวจสอบว่ามี row ถูกอัปเดตหรือไม่
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Category not found' });
+        if (checkCategory.rows.length === 0) {
+            return res.status(404).json({ error: 'หมวดหมู่นี้ไม่พบในฐานข้อมูล' });
         }
 
-        // ส่งผลลัพธ์ของ row ที่ถูกอัปเดตแล้วกลับไปยังผู้เรียกใช้งานในรูปแบบ JSON
-        res.json(result.rows[0]);
+        // อัปเดตข้อมูลหมวดหมู่
+        const result = await pool.query(
+            'UPDATE public."category" SET category_name = $1, update_by = $2, update_at = CURRENT_TIMESTAMP WHERE category_id = $3 RETURNING *',
+            [category_name, emp_ID, id]
+        );
+
+        res.status(200).json({ message: 'อัพเดทรายการหมวดหมู่สำเร็จ', category: result.rows[0] });
 
     } catch (error) {
-        // หากเกิดข้อผิดพลาดในระหว่างการอัปเดตข้อมูลหรือประมวลผล
         console.error('Error updating category:', error);
-
-        // ส่งสถานะ HTTP 500 (Internal Server Error) และส่งข้อความ error กลับไปในรูปแบบ JSON
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-
 // กำหนดเส้นทาง (route) สำหรับรับคำขอ HTTP แบบ DELETE ที่ endpoint '/delete/:id'
 // โดย :id เป็นตัวแปรที่รับค่า id ของหมวดหมู่ที่ต้องการลบ
 router.delete('/delete/:id', async (req, res) => {
-
     try {
-        // ดึงค่า id จาก URL parameter (:id) ที่ส่งมา
-        const { id } = req.params;
+        const { id } = req.params; // รับค่า id จาก URL
 
-        // ทำการคิวรีเพื่อลบข้อมูลจากตาราง "category" ใน schema "public"
-        // ลบเฉพาะ row ที่มี category_id ตรงกับ id ที่ส่งมา
-        const result = await pool.query('DELETE FROM public."category" WHERE category_id = $1 RETURNING *', [id]);
+        // ตรวจสอบว่า category_id นี้มีอยู่ในฐานข้อมูลหรือไม่
+        const checkCategory = await pool.query(
+            'SELECT * FROM public."category" WHERE category_id = $1',
+            [id]
+        );
 
-        // ตรวจสอบว่ามี row ถูกลบหรือไม่
-        if (result.rowCount === 0) {
-            // หากไม่มี row ที่ถูกลบ (เช่น ไม่มี category_id ที่ตรงกับ id ที่ส่งมา)
-            // ส่งสถานะ 404 (Not Found) พร้อมข้อความ error
-            return res.status(404).json({ error: 'Category not found' });
+        if (checkCategory.rows.length === 0) {
+            return res.status(404).json({ error: 'ไม่พบหมวดหมู่นี้ในฐานข้อมูล' });
         }
 
-        // ส่งสถานะ HTTP 200 และข้อความยืนยันว่าลบข้อมูลเรียบร้อย
-        res.status(200).json({ message: 'Category deleted successfully' });
+        // หากมี category_id ให้ลบข้อมูล
+        await pool.query('DELETE FROM public."category" WHERE category_id = $1', [id]);
 
+        res.status(200).json({ message: 'ลบหมวดหมู่สำเร็จ' });
     } catch (error) {
-        // หากเกิดข้อผิดพลาดในระหว่างการลบข้อมูลหรือประมวลผล
-        // แสดง error ใน console เพื่อให้ผู้พัฒนาสามารถดูข้อผิดพลาดที่เกิดขึ้น
         console.error('Error deleting category:', error);
-
-        // ส่งสถานะ HTTP 500 (Internal Server Error) และส่งข้อความ error กลับไปในรูปแบบ JSON
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
