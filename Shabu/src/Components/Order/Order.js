@@ -1,67 +1,85 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import './Order.css';
-import { useNavigate } from 'react-router-dom';
 
-const OrderPage = () => {
+const Order = () => {
+    const [orders, setOrders] = useState([]); // เก็บข้อมูลคำสั่งซื้อที่ดึงมาจาก API
+    const [selectedOrder, setSelectedOrder] = useState(null);
     const [selectedTable, setSelectedTable] = useState(1);
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-
-    const fetchOrderData = async (tableId) => {
-        setLoading(true);
-        try {
-            const response = await fetch(`http://localhost:3001/orders?tableId=${tableId}`);
-            const data = await response.json();
-            setOrders(data);
-        } catch (error) {
-            console.error("Error fetching order data:", error);
-        }
-        setLoading(false);
-    };
 
     useEffect(() => {
-        fetchOrderData(selectedTable);
-    }, [selectedTable]);
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/pending-orders');
+                if (response.ok) {
+                    const data = await response.json();
+                    setOrders(data); // ตั้งค่า orders ด้วยข้อมูลที่ได้จาก API
+                } else {
+                    console.error('Error fetching orders:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        fetchOrders(); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลคำสั่งซื้อเมื่อ component ถูก mount
+    }, []);
+
+    const goToMain = () => {
+        window.location.href = '/Mainmenu';
+    };
+
+    const handleOrderClick = (order) => {
+        setSelectedOrder(order);
+    };
+
+    const handleTableClick = (tableNumber) => {
+        setSelectedTable(tableNumber);
+        setSelectedOrder(null);
+    };
+
+    // กรองคำสั่งซื้อโดยใช้ table ที่เลือก
+    const filteredOrders = orders.filter(order => order.table_id === selectedTable && order.status !== 'Completed');
 
     return (
-        <div className="order__main-container">
-            <div className="order__sidebar">
-                <button onClick={() => navigate('/')}>กลับสู่หน้าหลัก</button>
-                <div className="order__icon-container">
-                    <img src="path/to/icon.png" alt="Chef Icon" className="order__icon" />
-                </div>
-                <ul className="order__table-list">
-                    {[1, 2, 3, 4, 5].map((table) => (
-                        <li
-                            key={table}
-                            onClick={() => setSelectedTable(table)}
-                            className={`order__table-item ${selectedTable === table ? 'active' : ''}`}
-                        >
-                            โต๊ะ {table}
-                        </li>
-                    ))}
-                </ul>
+        <div className='main-container'>
+            <div className='sidebar'>
+                <input type='submit' onClick={goToMain} value='BackToMain' />
+                <img src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="Logo" />
+                {[1, 2, 3, 4, 5].map(tableNumber => (
+                    <button key={tableNumber} onClick={() => handleTableClick(tableNumber)}>Table {tableNumber}</button>
+                ))}
             </div>
 
-            <div className="order__content">
+            <div className="content">
                 <div className="order__slidebar">
-                    <h2>รายการสั่งซื้อของโต๊ะ {selectedTable}</h2>
+                    <h2>Orders for Table {selectedTable}</h2>
+                    {filteredOrders.map((order) => (
+                        <div
+                            key={order.order_id}
+                            className="order__item"
+                            onClick={() => handleOrderClick(order)}
+                        >
+                            Order #{order.order_id}
+                        </div>
+                    ))}
                 </div>
-
                 <div className="order__mainbar">
-                    {loading ? (
-                        <p>กำลังโหลด...</p>
-                    ) : orders.length > 0 ? (
-                        orders.map((order) => (
-                            <div key={order.order_id} className="order__item">
-                                <p><strong>รหัสคำสั่งซื้อ:</strong> {order.order_id}</p>
-                                <p><strong>สถานะ:</strong> {order.status}</p>
-                                <p><strong>รายการ:</strong> {order.items.map((item) => item.name).join(", ")}</p>
-                            </div>
-                        ))
-                    ) : (
-                        <p>ไม่มีคำสั่งซื้อสำหรับโต๊ะนี้</p>
+                    <h1>Order Details</h1>
+                    {selectedOrder && (
+                        <div>
+                            <h2>Order #{selectedOrder.order_id}</h2>
+                            <p>Status: {selectedOrder.status}</p>
+                            <h3>Items:</h3>
+                            <ul>
+                                {selectedOrder.items ? (
+                                    selectedOrder.items.map((item, index) => (
+                                        <li key={index}>{item.category_item_name} - Quantity: {item.quantity}</li>
+                                    ))
+                                ) : (
+                                    <li>No items available.</li>
+                                )}
+                            </ul>
+                        </div>
                     )}
                 </div>
             </div>
@@ -69,4 +87,4 @@ const OrderPage = () => {
     );
 };
 
-export default OrderPage;
+export default Order;
