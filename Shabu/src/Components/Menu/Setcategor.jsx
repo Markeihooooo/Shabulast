@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Button, Section, Table, Text } from "@radix-ui/themes";
 import { MdModeEdit } from "react-icons/md";
 
-import  itemsInCategory  from './SetItemIncategory';
 
 
 const Setcategor = () => {
@@ -12,7 +11,8 @@ const Setcategor = () => {
   const [totalPages, setTotalPages] = useState(0);   // เก็บจำนวนหน้าทั้งหมด
   const [totalItems, setTotalItems] = useState(0);   // เก็บจำนวนข้อมูลทั้งหมด
 
-  
+  // const navigate = useNavigate();
+
   // useEffect สำหรับดึงข้อมูลหมวดหมู่
   useEffect(() => {
     const fetchCategories = async () => {
@@ -105,7 +105,7 @@ const Setcategor = () => {
       <Section className="flex justify-end space-x-4 mt-6">
         <Button
           className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors w-24"
-          onClick={() => navigate('/items-in-category')} // ใช้ navigate เพื่อเปลี่ยนหน้า
+          // onClick={() => navigate('/itemsCategory')}
         >
           ต่อไป
         </Button>
