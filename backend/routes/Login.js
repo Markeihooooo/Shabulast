@@ -104,7 +104,7 @@ router.post ('/login',async (req,res)=>{
       if (!passwordMatch){
         return res.status(401).json({error:"รหัสผ่านไม่ถูกต้อง"});
       }
-      const token = jwt.sign({employeeid:user.employeeid,role:user.role},secret,{expiresIn:"1d"});
+      const token = jwt.sign({employeeid:user.employeeid,role:user.role,username:user.username},secret,{expiresIn:"1d"});
       res.status(200).json({message:"เข้าสู่ระบบสําเร็จ",token,role:user.role});
   }catch(error){
     console.error('ERROR Login:',error);
@@ -119,8 +119,9 @@ router.post ('/login',async (req,res)=>{
    try{
     const token = req.params.token;
     const decode = await jwt.verify(token, secret);
+    const username = decode.username;
     const role = decode.role;
-    res.status(200).json({ role });
+    res.status(200).json({ role, username });
 }catch(error){
   console.error('Error fetching role:', error);
   res.status(500).json({ error: 'Internal Server Error' });
