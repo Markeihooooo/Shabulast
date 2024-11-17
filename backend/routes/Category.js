@@ -41,52 +41,48 @@ router.get('/get', async (req, res) => {
 // กำหนดเส้นทาง (route) ในการรับคำขอ HTTP แบบ POST ที่ endpoint '/category'
 // โดยใช้ async function เพื่อรองรับการทำงานแบบ asynchronous
 router.post('/create', async (req, res) => {
-    const { category_name } = req.body;
+    const { category_name } = req.body; // รับค่า category_name จาก body
 
-    // ตรวจสอบข้อมูลที่ได้รับจาก body
+    // ตรวจสอบว่า category_name ถูกส่งมาหรือไม่
     if (!category_name) {
-        return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบ' });
+        return res.status(400).json({ error: 'กรุณากรอกชื่อหมวดหมู่' });
     }
-    try {
-        // รับ token จาก header Authorization
-        const token = req.header('Authorization')?.replace('Bearer ', '');
 
+    try {
+        // รับค่า token จาก header Authorization
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        
         if (!token) {
             return res.status(401).json({ error: 'Token is missing or invalid' });
         }
 
-        // ตรวจสอบ token และดึงข้อมูลผู้ใช้
-        try {
-            const decoded = jwt.verify(token, secret);
-            const create_by = decoded.emp_id; // ดึง employeeid จาก decoded token
+        // Decode token
+        const decoded = jwt.verify(token, secret);
+        console.log('Decoded token:', decoded);
 
-            if (!create_by) {
-                return res.status(400).json({ error: 'Invalid user' });
-            }
-
-            // ตรวจสอบว่า category_name นี้มีอยู่ในฐานข้อมูลแล้วหรือไม่
-            const checkCategory = await pool.query(
-                'SELECT * FROM public."category" WHERE category_name = $1',
-                [category_name]
-            );
-
-            if (checkCategory.rows.length > 0) {
-                return res.status(400).json({ error: 'หมวดหมู่นี้มีอยู่แล้ว' });
-            }
-
-            // ทำการคิวรีเพื่อเพิ่มข้อมูลใหม่ในตาราง "category"
-            const result = await pool.query(
-                'INSERT INTO public."category" (category_name, create_by) VALUES ($1, $2) RETURNING *',
-                [category_name, create_by]
-            );
-
-            // ส่งผลลัพธ์กลับ
-            res.status(201).json({ message: 'สร้างหมวดหมู่สำเร็จ', category: result.rows[0] });
-
-        } catch (error) {
-            console.error("Invalid token", error);
-            return res.status(401).json({ error: 'Token is invalid or expired' });
+        // ดึง emp_ID จาก decoded token
+        const { emp_ID } = decoded;
+        if (!emp_ID) {
+            return res.status(400).json({ error: 'Invalid token - No emp_ID found' });
         }
+
+        // ตรวจสอบว่า category_name นี้มีอยู่ในฐานข้อมูลหรือไม่
+        const checkCategory = await pool.query(
+            'SELECT * FROM public."category" WHERE category_name = $1',
+            [category_name]
+        );
+
+        if (checkCategory.rows.length > 0) {
+            return res.status(400).json({ error: 'หมวดหมู่นี้มีอยู่แล้ว' });
+        }
+
+        // เพิ่มข้อมูลใหม่ในตาราง Category พร้อม emp_ID ใน create_by
+        const result = await pool.query(
+            'INSERT INTO public."category" (category_name, create_by) VALUES ($1, $2) RETURNING *',
+            [category_name, emp_ID]
+        );        
+
+        res.status(201).json({ message: 'สร้างหมวดหมู่สำเร็จ', category: result.rows[0] });
 
     } catch (error) {
         console.error('Error creating category:', error);
