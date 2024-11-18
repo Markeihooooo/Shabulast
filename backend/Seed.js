@@ -43,24 +43,26 @@ async function seed() {
     ('ไอศกรีม', 20, 'https://www.hfocus.org/sites/default/files/u11/shutterstock_13847400822.jpg', 3, 1)
     `);
 
-  
     // เพิ่มข้อมูลใน OrderInfo
-await pool.query(`
-    INSERT INTO OrderInfo (status, create_at)
-    VALUES 
-    ('กำลังดำเนินการ', NOW()),
-    ('เสร็จสิ้น', NOW())
-  `);
-  
+    await pool.query(`
+        INSERT INTO OrderInfo (status, create_at) 
+        VALUES 
+        ('เสร็จสิ้น', NOW()),
+        ('กำลังดำเนินการ', NOW()),
+        ('ยกเลิก', NOW())
+        
+      `);
 
     // เพิ่มข้อมูลใน TableInfo
     await pool.query(`
       INSERT INTO TableInfo (table_id, order_id, table_name)  
       VALUES 
-      (gen_random_uuid(), 1,1),
-      (gen_random_uuid(), 2,2),
-      (gen_random_uuid(), 1,3),
-      (gen_random_uuid(), 2,4)
+      (gen_random_uuid(), 1, '1'),
+      (gen_random_uuid(), 2, '2'),
+      (gen_random_uuid(), 3, '3'),
+      (gen_random_uuid(), NULL, '4'),
+      (gen_random_uuid(), NULL, '5')
+      
     `);
 
     // เพิ่มข้อมูลใน Bill
@@ -69,6 +71,17 @@ await pool.query(`
       VALUES 
       (4, (SELECT table_id FROM TableInfo LIMIT 1), FALSE, 1),
       (2, (SELECT table_id FROM TableInfo OFFSET 1 LIMIT 1), FALSE, 1)
+    `);
+
+    // สร้างข้อมูลตัวอย่างสำหรับตาราง Order_item
+    await pool.query(`
+      INSERT INTO Order_item (category_item_id, quantity, order_id) 
+      VALUES
+      (1, 10, 1),
+      (1, 10, 2),
+      (2, 10, 2),
+      (2, 10, 3)
+      
     `);
 
     console.log("Seeding completed successfully!");
