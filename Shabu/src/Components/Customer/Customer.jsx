@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import './Customer.css';
 
@@ -51,10 +52,14 @@ const CustomerPage = () => {
 
   const addToCart = (item) => {
     updateCart(item, 1);
-    setIsCartOpen(true);
+    setIsCartOpen(true);  // เปิดบาร์สไลด์หลังจากกด + 
   };
 
-  const increaseQuantity = (item) => updateCart(item, 1);
+  const increaseQuantity = (item) => {
+    updateCart(item, 1);
+    setIsCartOpen(true);  // เปิดบาร์สไลด์หลังจากเพิ่มจำนวนสินค้า
+  };
+  
   const decreaseQuantity = (item) => updateCart(item, -1);
 
   const handleCheckout = () => {
@@ -83,7 +88,8 @@ const CustomerPage = () => {
   };
 
   const closeConfirmationPopup = () => {
-    setShowConfirmationPopup(false);
+    setShowConfirmationPopup(false); // ปิดป๊อปอัป
+    setCart([]); // รีเซ็ตค่า cart เป็นค่าว่าง
   };
 
   const getCurrentDateTime = () => {
@@ -177,10 +183,7 @@ const CustomerPage = () => {
             <h2>ชำระเงิน</h2>
             <p>หมายเลขโต๊ะ: {tableNumber}</p>
             <p>วันที่และเวลา: {getCurrentDateTime()}</p>
-            <button onClick={handleCallStaff} className="call-staff-btn">
-              เรียกพนักงานเพื่อชำระเงิน
-            </button>
-            {paymentRequest && <p>พนักงานกำลังเดินทางมา</p>}
+            <button onClick={handleCallStaff} className="call-staff-btn">เรียกพนักงาน</button>
           </div>
         </div>
       )}
@@ -189,3 +192,4 @@ const CustomerPage = () => {
 };
 
 export default CustomerPage;
+

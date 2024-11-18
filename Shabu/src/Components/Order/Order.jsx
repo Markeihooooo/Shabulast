@@ -1,93 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Order.css';
 
 const Order = () => {
-  const [selectedOrder, setSelectedOrder] = useState(null); // State สำหรับเก็บข้อมูลคำสั่งซื้อที่เลือก
-  const [selectedTable, setSelectedTable] = useState(1); // State สำหรับเก็บโต๊ะที่เลือก
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedTable, setSelectedTable] = useState(1);
+  const [orders, setOrders] = useState([]);
 
   const goToMain = () => {
     window.location.href = '/Mainmenu';
   };
 
   const handleOrderClick = (order) => {
-    setSelectedOrder(order); // อัปเดตสถานะด้วยข้อมูลคำสั่งซื้อที่ถูกคลิก
+    setSelectedOrder(order);
   };
 
   const handleTableClick = (tableNumber) => {
-    setSelectedTable(tableNumber); // อัปเดตโต๊ะที่เลือก
-    setSelectedOrder(null); // รีเซ็ตคำสั่งซื้อที่เลือกเมื่อเปลี่ยนโต๊ะ
+    setSelectedTable(tableNumber);
+    setSelectedOrder(null);
+    fetchOrders(tableNumber);
   };
 
-  // ตัวอย่างข้อมูลคำสั่งซื้อ
-  const orders = [
-    { table: 1, id: 101, items: ['Pizza5555', 'Salad'], status: 'Pending' },
-    { table: 1, id: 102, items: ['Pasta', 'Drink'], status: 'Confirmed' },
-    { table: 1, id: 103, items: ['Burger', 'Fries'], status: 'Completed' },
-    { table: 2, id: 104, items: ['Pizza', 'Salad'], status: 'Pending' },
-    { table: 2, id: 105, items: ['Pasta', 'Drink'], status: 'Confirmed' },
-    { table: 2, id: 106, items: ['Burger', 'Fries'], status: 'Completed' },
-    { table: 3, id: 104, items: ['Pizza', 'Salad'], status: 'Pending' },
-    { table: 3, id: 105, items: ['Pasta', 'Drink'], status: 'Confirmed' },
-    { table: 3, id: 106, items: ['Burger', 'Fries'], status: 'Completed' },
-    { table: 4, id: 104, items: ['Pizza', 'Salad'], status: 'Pending' },
-    { table: 4, id: 105, items: ['Pasta', 'Drink'], status: 'Confirmed' },
-    { table: 4, id: 106, items: ['Burger', 'Fries'], status: 'Completed' },
-    { table: 5, id: 104, items: ['Pizza', 'Salad'], status: 'Pending' },
-    { table: 5, id: 105, items: ['Pasta', 'Drink'], status: 'Confirmed' },
-    { table: 5, id: 106, items: ['Burger', 'Fries'], status: 'Completed' },
-  ];
+  const fetchOrders = async (tableNumber) => {
+    try {
+      const response = await fetch(`http://localhost:5000/order-details?bill_id=${tableNumber}`);
+      const data = await response.json();
+      setOrders(data); // set ข้อมูลคำสั่งซื้อที่ได้รับไปยัง state ของ orders
+    } catch (error) {
+      console.error('เกิดข้อผิดพลาดในการดึงข้อมูลคำสั่งซื้อ:', error);
+    }
+  };
 
-  // กรองคำสั่งซื้อโดยใช้ table ที่เลือก
-  const filteredOrders = orders.filter(order => order.table === selectedTable && order.status !== 'Completed');
+  useEffect(() => {
+    fetchOrders(selectedTable);
+  }, [selectedTable]);
 
   return (
-    <>
-      <div className='main-container'>
-        <div className='sidebar'>
-          <input type='submit' onClick={goToMain} value='BackToMain' />
-          <img src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="Logo" />
-          <button onClick={() => handleTableClick(1)}>Table 1</button>
-          <button onClick={() => handleTableClick(2)}>Table 2</button>
-          <button onClick={() => handleTableClick(3)}>Table 3</button>
-          <button onClick={() => handleTableClick(4)}>Table 4</button>
-          <button onClick={() => handleTableClick(5)}>Table 5</button>
-        </div>
+    <div className='main-container'>
+      <div className='sidebar'>
+        <input type='submit' onClick={goToMain} value='BackToMain' />
+        <img src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="Logo" />
+        {[1, 2, 3, 4, 5].map(num => (
+          <button key={num} onClick={() => handleTableClick(num)}>Table {num}</button>
+        ))}
+      </div>
 
-        <div className="content">
-          <div className="order__slidebar">
-            <h2>Orders for Table {selectedTable}</h2>
-            {filteredOrders.map((order) => (
-              <div 
-                key={order.id} 
-                className="order__item" 
-                onClick={() => handleOrderClick(order)} // เรียกฟังก์ชันเมื่อคลิก
-              >
-                Order #{order.id}
-              </div>
-            ))}
-          </div>
-          <div className="order__mainbar">
-            <h1>Order Details</h1>
-            {selectedOrder && (
-              <div>
-                <h2>Order #{selectedOrder.id}</h2>
-                <p>Status: {selectedOrder.status}</p>
-                <h3>Items:</h3>
-                <ul>
-                  {Array.isArray(selectedOrder.items) && selectedOrder.items.length > 0 ? (
-                    selectedOrder.items.map((item, index) => (
-                      <li key={index}>{item}</li> // แสดงรายการอาหารเป็น list
-                    ))
-                  ) : (
-                    <li>No items available.</li> // แสดงข้อความเมื่อไม่มีรายการอาหาร
-                  )}
-                </ul>
-              </div>
-            )}
-          </div>
+      <div className="content">
+        <div className="order__slidebar">
+          <h2>Orders for Table {selectedTable}</h2>
+          {orders.map(order => (
+            <div
+              key={order.order_id}
+              className="order__item"
+              onClick={() => handleOrderClick(order)}
+            >
+              Order #{order.order_id}
+            </div>
+          ))}
+        </div>
+        <div className="order__mainbar">
+          <h1>Order Details</h1>
+          {selectedOrder && (
+            <div>
+              <h2>Order #{selectedOrder.order_id}</h2>
+              <p>Status: {selectedOrder.order_status}</p>
+              <h3>Items:</h3>
+              <ul>
+                {selectedOrder.items.map((item, index) => (
+                  <li key={index}>{item.category_item_name} (x{item.quantity})</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
