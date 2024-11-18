@@ -38,16 +38,17 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
         setSuccess('');
 
         try {
+            //const token = localStorage.getItem('token');
             const token = localStorage.getItem('token');
             const response = await axios.patch(
-                `/category/update/${category.category_id}`,
+                `http://localhost:3001/category/update/${category.category_id}`,
                 { category_name: categoryName, is_active: isActive.toString() },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             setSuccess('อัปเดตหมวดหมู่สำเร็จ');
             onCategoryUpdated(response.data.category);
-            setTimeout(handleClose, 1500);
+            //setTimeout(handleClose, 1500);
         } catch (error) {
             setError('เกิดข้อผิดพลาดในการอัปเดตข้อมูล');
         } finally {
@@ -80,7 +81,7 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
                             autoFocus
                             disabled={loading}
                         />
-                        
+
                         <p className="text-sm text-gray-500">
                             {categoryName.length}/{MAX_CATEGORY_LENGTH} ตัวอักษร
                         </p>
@@ -104,7 +105,7 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
                         </p>
                     )}
 
-<div className="flex justify-between gap-2 pt-2">
+                    <div className="flex justify-between gap-2 pt-2">
                         <button
                             type="button"
                             onClick={handleClose}

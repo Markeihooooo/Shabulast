@@ -17,7 +17,7 @@ router.get('/get', async (req, res) => {
     try {
         // Query to get categories
         const result = await pool.query(
-            `SELECT * FROM public."category" LIMIT $1 OFFSET $2`,
+            `SELECT * FROM public."category"ORDER BY category_id LIMIT $1 OFFSET $2`,
             [itemsPerPage, offset]
         );
 

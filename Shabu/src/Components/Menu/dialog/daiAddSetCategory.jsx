@@ -40,60 +40,77 @@ const CreateCategoryDialog = ({ isOpen, onClose, onSuccess }) => {
         if (success) setSuccess('');
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Validate input
+    
+        // ตรวจสอบความถูกต้องของข้อมูล
         const validationError = validateCategoryName(categoryName);
         if (validationError) {
             setError(validationError);
             return;
         }
-
+    
         setError('');
         setSuccess('');
         setLoading(true);
-
+    
         try {
-            const token = localStorage.getItem('authToken');
-            localStorage.setItem('Authorization', token);
+            // const token = localStorage.getItem('authToken');
+            // localStorage.setItem('Authorization', token);
+            
+            const token = localStorage.getItem('token');
+            // หากไม่พบ token ใน localStorage ให้แสดงข้อความแจ้งเตือน
             if (!token) {
                 setError('กรุณาเข้าสู่ระบบอีกครั้ง');
+                setLoading(false); // รีเซ็ตสถานะ loading
+                console.error('Token not found in localStorage');
+                console.log(localStorage.getItem('token'));
                 return;
             }
-
+    
+            // เรียก API เพื่อสร้างหมวดหมู่
             const response = await axios.post(
-                '/category/create',
+                'http://localhost:3001/category/create',
                 { category_name: categoryName.trim() },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                 }
             );
-
+    
+            // หาก API ส่ง token ใหม่กลับมา ให้บันทึกลงใน localStorage
+            if (response.data?.token) {
+                localStorage.setItem('token', response.data.token);
+            }
+    
             setSuccess('สร้างหมวดหมู่สำเร็จ');
-
-            // Call onSuccess callback if provided
+    
+            // เรียก callback หากกำหนดไว้
             if (onSuccess) {
                 onSuccess(response.data.category);
             }
-
-            // Close dialog after success
+    
+            // ปิด Dialog หลังจากสำเร็จ
             setTimeout(() => {
                 handleClose();
             }, 1500);
-
         } catch (err) {
-            const errorMessage = err.response?.data?.error ||
+            const errorMessage =
+                err.response?.data?.error ||
                 err.response?.data?.message ||
                 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+                console.log(err);
+                console.log(localStorage.getItem('token'));
+
             setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
