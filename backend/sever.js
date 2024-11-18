@@ -11,6 +11,9 @@ dotenv.config();
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 // ใช้ cors ในทุกคำขอ
 app.use(cors());
 
