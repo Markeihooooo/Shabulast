@@ -6,7 +6,13 @@ const pool = require('../db'); // สมมติว่ามีการตั�
 router.get('/get/:category_id', async (req, res) => {
     const { category_id } = req.params;
 
+    // ตรวจสอบว่า category_id มีค่าหรือไม่ และเป็นตัวเลขที่ถูกต้อง
+    if (!category_id || isNaN(category_id)) {
+        return res.status(400).json({ message: 'Invalid or missing category_id' });
+    }
+
     try {
+        // สร้าง SQL query เพื่อดึงข้อมูล Category_item โดยกรองตาม category_id
         const query = `
             SELECT 
                 category_item_id,
@@ -16,7 +22,7 @@ router.get('/get/:category_id', async (req, res) => {
             FROM Category_item
             WHERE category_id = $1
         `;
-
+        
         const { rows } = await pool.query(query, [category_id]);
 
         // ตรวจสอบว่าพบข้อมูลหรือไม่
@@ -24,12 +30,14 @@ router.get('/get/:category_id', async (req, res) => {
             return res.status(404).json({ message: 'No items found for this category' });
         }
 
+        // ส่งข้อมูลที่ดึงมาให้กับผู้ใช้
         res.json(rows);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 // router.post('/create', async (req, res) => {
 //     const { category_id, category_item_name, category_item_balance, image_url } = req.body;
 
