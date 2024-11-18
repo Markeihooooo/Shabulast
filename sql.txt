@@ -11,7 +11,7 @@ CREATE TABLE Employee (
 CREATE TABLE Category (
     category_id SERIAL PRIMARY KEY,
     category_name VARCHAR(100) NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,     -----------------------------------------change status to is_active
+    is_active BOOLEAN DEFAULT TRUE,   
     create_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_by INT REFERENCES Employee(emp_ID) ON DELETE SET NULL,
@@ -42,6 +42,7 @@ CREATE TABLE OrderInfo (
 CREATE TABLE TableInfo (
     table_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id INT REFERENCES OrderInfo(order_id) ON DELETE SET NULL
+    table_name INT NOT NULL CHECK (table_name > 0),
 );
 
 -- ตาราง Bill
@@ -64,42 +65,6 @@ CREATE TABLE Order_item (
     quantity INT NOT NULL,
     order_id INT REFERENCES OrderInfo(order_id) ON DELETE CASCADE
 );
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Employee
-INSERT INTO Employee (username, password, phone_number, role) VALUES 
-('owner', 'ownerpass', '0123456789', 'เจ้าของ'),
-('employee1', 'employeepass1', '0987654321', 'พนักงาน'),
-('cook', 'cookpass', NULL, 'คนทำอาหาร');
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Category
-INSERT INTO Category (category_name, status, create_by, create_at) VALUES
-('Food', TRUE, 1, CURRENT_TIMESTAMP),
-('Drinks', TRUE, 2, CURRENT_TIMESTAMP);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Category_item
-INSERT INTO Category_item (category_item_name, category_item_balance, category_id, create_by, create_at) VALUES
-('Pasta', 20, 1, 1, CURRENT_TIMESTAMP),
-('Coffee', 30, 2, 2, CURRENT_TIMESTAMP);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง TableInfo
-INSERT INTO TableInfo (order_id) VALUES (NULL);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง OrderInfo
-INSERT INTO OrderInfo (status, create_at) VALUES
-('Pending', CURRENT_TIMESTAMP),
-('Completed', CURRENT_TIMESTAMP);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Bill
-INSERT INTO Bill (customer_count, table_id, payment_status, create_at, create_by, checkout) VALUES
-(2, (SELECT table_id FROM TableInfo LIMIT 1), FALSE, CURRENT_TIMESTAMP, 1, NULL);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Order_item
-INSERT INTO Order_item (category_item_id, quantity, order_id) VALUES
-(1, 2, 1),
-(2, 1, 1);
-
-
-
 
 SELECT 
     Bill.bill_id,
