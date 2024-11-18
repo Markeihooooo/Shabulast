@@ -47,9 +47,9 @@ async function seed() {
     await pool.query(`
         INSERT INTO OrderInfo (status, create_at) 
         VALUES 
-        ('เสร็จสิ้น', NOW()),
-        ('กำลังดำเนินการ', NOW()),
-        ('ยกเลิก', NOW())
+        ('Completed', NOW()),
+        ('pending', NOW()),
+        ('Canceled', NOW())
         
       `);
 
@@ -60,9 +60,7 @@ async function seed() {
       (gen_random_uuid(), 1, '1'),
       (gen_random_uuid(), 2, '2'),
       (gen_random_uuid(), 3, '3'),
-      (gen_random_uuid(), NULL, '4'),
-      (gen_random_uuid(), NULL, '5')
-      
+      (gen_random_uuid(), 3, '4')
     `);
 
     // เพิ่มข้อมูลใน Bill
@@ -77,10 +75,11 @@ async function seed() {
     await pool.query(`
       INSERT INTO Order_item (category_item_id, quantity, order_id) 
       VALUES
-      (1, 10, 1),
+      (1, 10, 1), --เลขตำแหน่งที่ 1 คือ รายการอาหาร เลขตำแหน่งที่ 2 คือ จํานวน 10 ชิ้น เลขตำแหน่งที่ 3 คือ เลขออเดอร์ที่ 1
       (1, 10, 2),
       (2, 10, 2),
       (2, 10, 3)
+    
       
     `);
 
