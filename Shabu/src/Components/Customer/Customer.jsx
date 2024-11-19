@@ -16,7 +16,8 @@ const CustomerPage = () => {
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [items, setItems] = useState([]);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
-
+  const [tablenumber, setTablenumber] = useState(null); 
+  const [countnumber, setCountnumber] = useState(null); 
 
 
   // Fetch categories with pagination
@@ -60,7 +61,17 @@ const CustomerPage = () => {
     // ไม่ต้องล้าง items ตรงนี้
   };
   
-  
+  useEffect(() => {
+    // ดึงค่าพารามิเตอร์จาก URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const table = searchParams.get('table');
+    const count = searchParams.get('count');
+
+    // อัปเดต State
+    setTablenumber(table);
+    setCountnumber(count);
+  }, []); 
+
 
   useEffect(() => {
     console.log("Current Page:", currentPage);
@@ -125,6 +136,10 @@ const CustomerPage = () => {
           <div className="flex flex-col justify-center items-center space-x-4 p-4 bg-red-100">
             <img src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="" className="w-20 h-20 object-contain" />
             <h2 className="text-xl font-extrabold text-red-700 tracking-wide">หมวดหมู่อาหาร</h2>
+           
+            <h3 className="text-s font-extrabold text-red-700 tracking-wide">โต๊ะที่: {tablenumber}</h3>
+            <h3 className="text-s font-extrabold text-red-700 tracking-wide">จํานวนคน: {countnumber}</h3> 
+           
           </div>
 
           {categories.map((category) => (
