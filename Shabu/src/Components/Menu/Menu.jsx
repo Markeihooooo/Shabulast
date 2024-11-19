@@ -41,10 +41,11 @@ const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor
         
         <input type='submit' onClick={toggleReceiveCustomer} value='รับลูกค้า' />
         <input type='submit' onClick={toggleSetcategor} value='จัดรายการอาหาร' />
+        <input type='submit' onClick={toggleItemsInCategory} value='รายการเมนู' />
         <input type='submit' onClick={togglePayment} value='ชำระเงินลูกค้า' />
         <input type='submit' onClick={toggleHistory} value='ประวัติรายการสั่ง' />
         <input type='submit' value='สมัครสมาชิก' onClick={toggleRegister} />    
-        <input type='submit' onClick={toggleItemsInCategory} value='รายการเมนู' />
+       
         </>
         )}
         {Role === 'พนักงานร้าน'&&(

@@ -82,8 +82,70 @@ const ReceiveCustomer = () => {
     return btoa(`${table}-${count}-${Date.now()}`);
   };
 
+  const handlePrintQRCode = () => {
+    const qrCodeElement = document.getElementById('qrcode');
+    if (!qrCodeElement) return;
+    const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.open();
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>พิมพ์ QR Code</title>
+        <style>
+          @page {
+            size: 80mm 150mm; /* กำหนดขนาดใบเสร็จ (กว้าง x สูง) */
+            margin: 10mm;
+          }
+          body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+          }
+          .qrcode-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            
+          }
+          .receipt-info {
+            margin-top: 10px;
+            font-size: 14px;
+          }
+            .receipt-intro {
+            margin-top: 10px;
+            font-size: 28px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="qrcode-container">
+        <div class="receipt-intro">ลูกค้าโต๊ะ ${tableNumber} <br>จำนวน ${customerCount} คน</div>
+        <div class="receipt-info">สแกนเพื่อสั่งอาหาร</div>
+          ${qrCodeElement.outerHTML}
+           <div class="receipt-info">ราคาต่อหัว 299 บาท</div>
+           <div class="receipt-info">รวมเป็นเงินทั้งหมด ${customerCount * 299} บาท</div>
+          <div class="receipt-info">ขอบคุณที่ใช้บริการ</div>
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }
+};
+  
+
   return (
-    <div className="container mx-auto p-4 max-w-md">
+    <div className="grid place-items-center min-h-screen">
+    <div className="container mx-auto max-w-md p-4 bg-gray-100 shadow-md">
       <h1 className="text-lg font-bold mb-4">รับลูกค้า</h1>
       <div className="mb-4">
         <label className="block mb-2">เลือกโต๊ะ</label>
@@ -92,7 +154,7 @@ const ReceiveCustomer = () => {
           value={tableNumber}
           className="w-full border rounded-md px-2 py-1"
         >
-          <option value="">-- เลือกโต๊ะ --</option>
+          <option value="" disabled>-- เลือกโต๊ะ --</option>
           <option value="1">โต๊ะ 1</option>
           <option value="2">โต๊ะ 2</option>
           <option value="3">โต๊ะ 3</option>
@@ -118,18 +180,23 @@ const ReceiveCustomer = () => {
       </button>
 
       {error && <p className="text-red-500 mt-2">{error}</p>}
-
+      
       {qrCodeUrl && (
         <div className="mt-4">
           <h3 className="font-bold mb-2">QR Code สำหรับลูกค้า:</h3>
-          <QRCode value={qrCodeUrl} />
+          <QRCode id='qrcode' className='mx-auto' value={qrCodeUrl} />
           <p className="mt-2">
             <a href={qrCodeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">
               เปิดลิงก์สำหรับลูกค้า
             </a>
           </p>
+          <button className="bg-green-500 text-white py-1 px-4 rounded-md mt-4"
+          onClick={handlePrintQRCode}>พิมพ์ใบเสร็จ</button>  
         </div>
+        
       )}
+      
+    </div>
     </div>
   );
 };
