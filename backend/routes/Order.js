@@ -1,43 +1,66 @@
 const express = require('express');
-const router = express.Router();  // กำหนดตัวแปร router ให้ถูกต้อง
+const router = express.Router();
 const pool = require('../db'); // เชื่อมต่อกับฐานข้อมูล PostgreSQL
 
-// กำหนด route สำหรับ /order-details
-router.get('/', async (req, res) => {
-  const billId = req.query.bill_id; // รับค่า bill_id จาก URL
-  try {
-    const query = `
+router.get('/pending-orders', (req, res) => {
+    const table_name = req.query.table_name;
+
+    let query = `
       SELECT 
-        Bill.bill_id,
-        Bill.customer_count,
-        Bill.payment_status,
-        Bill.create_at AS bill_create_at,
-        Bill.checkout,
-        Employee.username AS created_by,
-        TableInfo.table_id,
-        OrderInfo.order_id,
-        OrderInfo.status AS order_status,
-        OrderInfo.create_at AS order_create_at,
-        Order_item.order_item_id,
-        Order_item.quantity,
-        Category_item.category_item_name,
-        Category_item.category_item_balance,
-        Category.category_name
-      FROM Bill
-      LEFT JOIN TableInfo ON Bill.table_id = TableInfo.table_id
-      LEFT JOIN Employee ON Bill.create_by = Employee.emp_ID
-      LEFT JOIN OrderInfo ON TableInfo.order_id = OrderInfo.order_id
+        OrderInfo.order_id, 
+        OrderInfo.create_at AS order_create_at, 
+        TableInfo.table_name, 
+        Order_item.order_item_id, 
+        Category_item.category_item_name, 
+        Order_item.quantity, 
+        OrderInfo.status AS order_status 
+      FROM OrderInfo
+      LEFT JOIN TableInfo ON TableInfo.order_id = OrderInfo.order_id
       LEFT JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
       LEFT JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id
-      LEFT JOIN Category ON Category_item.category_id = Category.category_id
-      WHERE Bill.bill_id = $1;
     `;
-    const { rows } = await pool.query(query, [billId]);
-    res.json(rows);  // ส่งผลลัพธ์กลับเป็น JSON
-  } catch (error) {
-    console.error('Error fetching order details:', error);
-    res.status(500).send('Error fetching order details');
-  }
+
+    if (table_name) {
+        query += ` WHERE TableInfo.table_name = $1`;
+    }
+
+    pool.query(query, table_name ? [table_name] : [])
+        .then(result => res.json(result.rows))
+        .catch(err => {
+            console.error('Error fetching data from database:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+router.put('/update-order-status/:order_id', async (req, res) => {
+    const { order_id } = req.params;  // รับค่า order_id จาก URL
+    const { status } = req.body; // รับค่า status จาก body ของคำขอ
+
+    // ตรวจสอบว่ามีค่า status ถูกส่งมาหรือไม่ และเป็นค่าที่อนุญาตให้เปลี่ยนได้
+    if (!status || (status !== 'Completed' && status !== 'Canceled')) {
+        return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    try {
+        const query = `
+            UPDATE OrderInfo
+            SET status = $1
+            WHERE order_id = $2
+            RETURNING *;
+        `;
+        const { rows } = await pool.query(query, [status, order_id]);  // ใช้ค่า status ที่ส่งมาจากคำขอ
+
+        if (rows.length === 0) {
+            console.error(`Order with ID ${order_id} not found`);
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        console.log(`Order ID ${order_id} updated to ${status}`);
+        res.json({ message: `Order status updated to ${status}`, order: rows[0] });
+    } catch (error) {
+        console.error('Error updating order status:', error.message);
+        res.status(500).json({ error: 'Error updating order status', details: error.message });
+    }
 });
 
 // ส่งออก router
