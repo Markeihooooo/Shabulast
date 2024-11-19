@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
-import './Customer.css';
+import React, { useState, useEffect } from 'react';
+import './Customer.css'; 
+
 
 const CustomerPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("เนื้อสัตว์");
