@@ -7,7 +7,6 @@ import Welcome from './welcome.jsx'
 import Setcategor from './Setcategor.jsx';
 import Payment from './Payment.jsx'
 import History from './History.jsx'
-import SetItemIncategory from './SetItemIncategory.jsx'
 import { Checkrole } from './MainindexJs.js';
 
 
@@ -34,9 +33,6 @@ import { Checkrole } from './MainindexJs.js';
     }
     const toggleHistory=()=>{
       setActiveComponent(prevstate=>(prevstate ==='History'? 'welcome':'History'));
-    }
-    const toggleItemsInCategory=()=>{
-      setActiveComponent(prevstate=>(prevstate ==='SetItemIncategory'? 'welcome':'SetItemIncategory'));
     }
     
     const [Role, setRole] = useState('');
@@ -66,7 +62,6 @@ import { Checkrole } from './MainindexJs.js';
                             togglePayment={togglePayment}
                             toggleHistory={toggleHistory}  
                             goToLogout={goToLogout}
-                            toggleItemsInCategory={toggleItemsInCategory}
                         />
                     )}
                     {Role === 'พนักงานร้าน' && (
@@ -95,7 +90,6 @@ import { Checkrole } from './MainindexJs.js';
          {activeComponent === 'Setcategor' && <Setcategor />}
          {activeComponent === 'Payment' && <Payment />}
          {activeComponent === 'History'&&<History />}
-         {activeComponent === 'SetItemIncategory' && <SetItemIncategory />}
         </div>
       </div>
     </>

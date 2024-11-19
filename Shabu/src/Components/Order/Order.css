@@ -1,53 +1,15 @@
-/* สไตล์สำหรับ container หลัก */
-.order__main-container {
+.order__main-container { /* Block */
     display: flex;
     height: 100vh;
 }
 
-/* Sidebar */
-.order__sidebar {
+.order__sidebar { /* Element */
     flex: 1;
     background-color: #f0f0f0;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-/* Icon container ใน sidebar */
-.order__icon-container {
-    margin: 20px 0;
-}
-
-.order__icon {
-    width: 80%;
-    border-radius: 50%;
-}
-
-/* Table list ใน sidebar */
-.order__table-list {
-    list-style-type: none;
-    padding: 0;
-    width: 100%;
-}
-
-/* Table item ใน sidebar */
-.order__table-item {
-    cursor: pointer;
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #fff;
-    border-radius: 5px;
-    text-align: center;
-}
-
-/* สไตล์เมื่อมีการเลือก table */
-.order__table-item.active {
-    background-color: #ddd;
-}
-
-/* Content area */
-.order__content {
+.order__content { /* Element */
     flex: 3;
     padding: 20px;
     background-color: #ffffff;
@@ -55,99 +17,61 @@
     flex-direction: column;
 }
 
-/* Slidebar ใน content */
-.order__slidebar {
+.order__slidebar { /* Element */
     background-color: red;
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 10px;
+    height: 20vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;
-    color: white;
+    width: 100vh;
 }
 
-/* Mainbar สำหรับรายการคำสั่งซื้อ */
-.order__mainbar {
+.order__mainbar { /* Element */
     background-color: lightgray;
     padding: 20px;
+    flex-grow: 1;
     border-radius: 10px;
+    height: 40vh;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
 }
-
-/* รายการคำสั่งซื้อ */
-.order__item {
-    border: 1px solid #ccc;
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
-
-/* Hover effect สำหรับ item */
-.order__item:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
-}
-
-/* สไตล์ของปุ่มทั่วไป */
 button {
-    padding: 10px 20px;
+    width: 100%;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     background-color: #007bff;
     color: white;
     font-size: 16px;
     cursor: pointer;
-    margin: 10px 0;
-}
-
-/* Hover effect สำหรับปุ่ม */
-button:hover {
+    margin: 10px;
+  }
+button:hover{
     background-color: blue;
 }
 
-/* Active effect เมื่อคลิกปุ่ม */
-button:active {
-    background-color: darkblue;
+.order__item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: yellow;
+    height: 100%;
+    width: 30%;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
 }
 
-/* Disabled state สำหรับปุ่ม */
-button:disabled {
-    background-color: #bdbdbd;
-    cursor: not-allowed;
+.order__item:hover{
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+    transition: all 0.3s ease;
 }
 
-/* สไตล์เฉพาะสำหรับปุ่ม "เปลี่ยนสถานะ" */
-.update-status-button {
-    background-color: #4CAF50; /* สีพื้นหลังเขียว */
-    color: white; /* สีตัวอักษร */
-    border: none; /* ไม่มีขอบ */
-    padding: 10px 20px; /* การเว้นระยะภายในปุ่ม */
-    font-size: 16px; /* ขนาดตัวอักษร */
-    cursor: pointer; /* เปลี่ยนเคอร์เซอร์เป็นมือเมื่อชี้ไปที่ปุ่ม */
-    border-radius: 5px; /* มุมปุ่มโค้ง */
-    transition: background-color 0.3s ease; /* การเปลี่ยนสีพื้นหลังเมื่อมีการโต้ตอบ */
-    width: auto; /* ความกว้างของปุ่มตามขนาดของเนื้อหา */
-    margin-top: 10px; /* ระยะห่างด้านบน */
-}
-
-/* เปลี่ยนสีพื้นหลังเมื่อชี้ไปที่ปุ่ม */
-.update-status-button:hover {
-    background-color: #45a049; /* สีพื้นหลังเข้มขึ้นเมื่อชี้ */
-}
-
-/* เปลี่ยนสีพื้นหลังเมื่อคลิกปุ่ม */
-.update-status-button:active {
-    background-color: #388e3c; /* สีพื้นหลังเข้มขึ้นเมื่อคลิก */
-}
-
-/* สไตล์เมื่อปุ่มถูกปิดการใช้งาน */
-.update-status-button:disabled {
-    background-color: #bdbdbd; /* สีพื้นหลังเมื่อปุ่มถูกปิดการใช้งาน */
-    cursor: not-allowed; /* เปลี่ยนเคอร์เซอร์เป็นปกติเมื่อปิดการใช้งาน */
-}

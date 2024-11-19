@@ -86,32 +86,31 @@ router.post('/create',async(req,res)=>{
   })
 
 
-  router.post ('/login',async (req,res)=>{
-    const {username,password}=req.body;
+// login 
+router.post ('/login',async (req,res)=>{
+  const {username,password}=req.body;
   
-
-    if (!username || !password){
-      return res.status(400).json({error:"กรุณากรอกข้อมูลให้ครบ"});
-    }
-    try{
-      const result = await pool.query('SELECT * FROM public."employee" WHERE username = $1',[username]);
-  
-      if (result.rows.length === 0){
-        return res.status(404).json({error:"ไม่พบพนักงาน"});}
-  
-        const user = result.rows[0];
-        const passwordMatch = await bcrypt.compare(password,user.password);
-        if (!passwordMatch){
-          return res.status(401).json({error:"รหัสผ่านไม่ถูกต้อง"});
-        }
-        const token = jwt.sign({employeeid:user.employeeid,role:user.role,username:user.username,emp_ID:user.emp_id},secret,{expiresIn:"1d"});
-        res.status(200).json({message:"เข้าสู่ระบบสําเร็จ",token,role:user.role});
-    }catch(error){
-      console.error('ERROR Login:',error);
-      res.status(500).json({error:"มีบางอย่างผิดพลาด"});
-    }
-  })
-
+  if (!username || !password){
+    return res.status(400).json({error:"กรุณากรอกข้อมูลให้ครบ"});
+  }
+  try{
+    const result = await pool.query('SELECT * FROM public."employee" WHERE username = $1',[username]);
+    
+    if (result.rows.length === 0){
+      return res.status(404).json({error:"ไม่พบพนักงาน"});}
+      
+      const user = result.rows[0];
+      const passwordMatch = await bcrypt.compare(password,user.password);
+      if (!passwordMatch){
+        return res.status(401).json({error:"รหัสผ่านไม่ถูกต้อง"});
+      }
+      const token = jwt.sign({employeeid:user.employeeid,role:user.role},secret,{expiresIn:"1d"});
+      res.status(200).json({message:"เข้าสู่ระบบสําเร็จ",token,role:user.role});
+  }catch(error){
+    console.error('ERROR Login:',error);
+    res.status(500).json({error:"มีบางอย่างผิดพลาด"});
+  }
+})
 
 
 // ดึกข้อมูล role
@@ -120,25 +119,11 @@ router.post('/create',async(req,res)=>{
    try{
     const token = req.params.token;
     const decode = await jwt.verify(token, secret);
-
     const role = decode.role;
-    res.status(200).json({ role});
+    res.status(200).json({ role });
 }catch(error){
   console.error('Error fetching role:', error);
   res.status(500).json({ error: 'Internal Server Error' });
 }}
 )
-
-router.get('/username/:token', async (req, res) => {
-  try{
-   const token = req.params.token;
-   const decode = await jwt.verify(token, secret);
- 
-   const username = decode.username;
-   res.status(200).json({ username});
-}catch(error){
- console.error('Error fetching username:', error);
- res.status(500).json({ error: 'Internal Server Error' });
-}})
-
 module.exports = router;
