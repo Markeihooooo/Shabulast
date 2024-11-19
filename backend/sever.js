@@ -7,9 +7,20 @@ const orderRoutes = require('./routes/Order');  // นำเข้า orderRoute
 const CategoryRouter = require('./routes/Category');
 const ItemCategoryRouter = require('./routes/ItemCategory');
 
+const path = require('path'); // เพิ่มการ import โมดูล path
+
+
 dotenv.config();
 
 const app = express();
+
+
+app.use(express.json({ limit: '10mb' })); // เพิ่มขีดจำกัดการรับ JSON ที่ 10MB
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // เพิ่มขีดจำกัดการรับ URL-encoded form data ที่ 10MB
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // ใช้ cors ในทุกคำขอ
 app.use(cors());
@@ -34,8 +45,8 @@ app.use('/login', LoginRouter);
 
 // ใช้ route ที่เชื่อมโยงกับ /order-details
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
-app.use('/category',CategoryRouter);
-app.use('/itemCategory',ItemCategoryRouter);
+app.use('/category', CategoryRouter);
+app.use('/itemCategory', ItemCategoryRouter);
 
 
 // เริ่มเซิร์ฟเวอร์
