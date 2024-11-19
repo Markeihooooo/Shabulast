@@ -19,8 +19,6 @@ const CustomerPage = () => {
   const [tablenumber, setTablenumber] = useState(null); 
   const [countnumber, setCountnumber] = useState(null); 
 
-
-  // Fetch categories with pagination
   useEffect(() => {
     if (!selectedCategoryId) {
       const fetchCategories = async () => {
@@ -35,10 +33,8 @@ const CustomerPage = () => {
       };
       fetchCategories();
     }
-  }, [currentPage]); // Removed selectedCategoryId dependency
-  
+  }, [currentPage]);
 
-  // Fetch items for a selected category
   useEffect(() => {
     if (selectedCategoryId) {
       const fetchItems = async () => {
@@ -54,24 +50,18 @@ const CustomerPage = () => {
     }
   }, [selectedCategoryId]);
 
-  // Handle category selection
   const handleCategoryClick = (categoryId, categoryName) => {
     setSelectedCategoryId(categoryId);
     setSelectedCategoryName(categoryName);
-    // ไม่ต้องล้าง items ตรงนี้
   };
   
   useEffect(() => {
-    // ดึงค่าพารามิเตอร์จาก URL
     const searchParams = new URLSearchParams(window.location.search);
     const table = searchParams.get('table');
     const count = searchParams.get('count');
-
-    // อัปเดต State
     setTablenumber(table);
     setCountnumber(count);
   }, []); 
-
 
   useEffect(() => {
     console.log("Current Page:", currentPage);
@@ -108,10 +98,6 @@ const CustomerPage = () => {
     setIsCartOpen(false);
   };
 
-  const handlePayment = () => {
-    setShowPaymentPopup(true);
-  };
-
   const handleCallStaff = () => {
     setPaymentRequest(true);
     setShowConfirmationPopup(true);
@@ -122,12 +108,10 @@ const CustomerPage = () => {
     setShowConfirmationPopup(false);
   };
 
-  /// ฟังก์ชันสำหรับการเปลี่ยนหน้า
   const handleNextCategoryPage = () => {
-    setSelectedCategoryId(null); // Clear selected category
+    setSelectedCategoryId(null);
     setCurrentPage(prevPage => (prevPage < totalPages ? prevPage + 1 : 1));
   };
-  
 
   return (
     <div>
@@ -139,7 +123,6 @@ const CustomerPage = () => {
            
             <h3 className="text-s font-extrabold text-red-700 tracking-wide">โต๊ะที่: {tablenumber}</h3>
             <h3 className="text-s font-extrabold text-red-700 tracking-wide">จํานวนคน: {countnumber}</h3> 
-           
           </div>
 
           {categories.map((category) => (
@@ -147,14 +130,14 @@ const CustomerPage = () => {
               key={category.category_id}
               onClick={() => handleCategoryClick(category.category_id, category.category_name)}
               className={`px-6 py-3 mb-2 rounded-lg font-semibold text-sm transition-all duration-300 ease-in-out transform 
-              ${selectedCategoryId === category.category_id
-                  ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg'  // ปุ่มที่เลือก
-                  : 'bg-red-400 text-white hover:bg-red-500 shadow-md'}    // ปุ่มที่ไม่ได้เลือก
-            hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2`}
+      ${selectedCategoryId === category.category_id
+                  ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg'
+                  : 'bg-red-400 text-white hover:bg-red-500 shadow-md'} 
+      hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2`}
+              disabled={!category.is_active}
             >
               {category.category_name}
             </button>
-
           ))}
           <button
             onClick={handleNextCategoryPage}
@@ -162,7 +145,6 @@ const CustomerPage = () => {
           >
             ดูหมวดหมู่อื่น
           </button>
-
         </div>
 
         <div className="menu">
@@ -206,56 +188,41 @@ const CustomerPage = () => {
 
       {/* Cart */}
       <div className={`cart ${isCartOpen ? 'open' : ''}`}>
-        <button onClick={() => setIsCartOpen(false)} className="close-btn">ปิด</button>
-        <h2 className="cart-title">ตะกร้าสินค้า</h2>
-        {cart.length === 0 ? (
-          <p>ไม่มีสินค้าในตะกร้า</p>
-        ) : (
-          <div>
-            {cart.map((item) => (
-              <div key={item.id} className="cart-item">
-                <h3>{item.category_item_name}</h3>
-                <p>จำนวน: {item.quantity}</p>
-                <button onClick={() => updateCart(item, -1)}>-</button>
-                <button onClick={() => updateCart(item, 1)}>+</button>
-              </div>
-            ))}
-            <button onClick={handleCheckout} className="checkout-btn">ชำระเงิน</button>
-          </div>
-        )}
-      </div>
-
-      {/* Order Success Popup */}
-      {showOrderSuccessPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>สั่งอาหารสำเร็จ</h3>
-            <button onClick={handlePayment} className="payment-btn">ชำระเงิน</button>
-            <button onClick={() => setShowOrderSuccessPopup(false)} className="close-btn">ปิด</button>
-          </div>
+  <button onClick={() => setIsCartOpen(false)} className="close-btn">ปิด</button>
+  <h2 className="cart-title">ตะกร้าสินค้า</h2>
+  {cart.length === 0 ? (
+    <p>ไม่มีสินค้าในตะกร้า</p>
+  ) : (
+    <div>
+      {cart.map((item) => (
+        <div key={item.id} className="cart-item">
+          <h3>{item.category_item_name}</h3>
+          <p>จำนวน: {item.quantity}</p>
+          <button onClick={() => updateCart(item, -1)}>-</button>
+          <button onClick={() => updateCart(item, 1)}>+</button>
         </div>
-      )}
+      ))}
+      {/* ปุ่มอยู่ใน Container กึ่งกลาง */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
+  <button
+    onClick={handleCheckout}
+    className="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-700 mb-4"
+    style={{ width: '80%' }}
+  >
+    สั่งอาหาร
+  </button>
+  <button
+    onClick={handleCallStaff}
+    className="call-staff-btn"
+  >
+    เรียกพนักงานเพื่อชำระเงิน
+  </button>
+</div>
 
-      {/* Payment Popup */}
-      {showPaymentPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>กรุณาชำระเงิน</h3>
-            <button onClick={handleCallStaff} className="call-staff-btn">เรียกพนักงาน</button>
-            <button onClick={() => setShowPaymentPopup(false)} className="close-btn">ปิด</button>
-          </div>
-        </div>
-      )}
+    </div>
+  )}
+</div>
 
-      {/* Confirmation Popup */}
-      {showConfirmationPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>กำลังเรียกพนักงาน...</h3>
-            <button onClick={closeConfirmationPopup} className="close-btn">ปิด</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

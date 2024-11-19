@@ -1,4 +1,4 @@
-/* ปรับให้ครอบคลุมหน้าจอทั้งหมด */
+/* ตั้งค่าพื้นฐาน */
 html, body {
   height: 100%;
   width: 100%;
@@ -14,101 +14,97 @@ html, body {
   display: flex;
   width: 100vw;
   height: 100vh;
+  box-sizing: border-box;
 }
 
 /* Sidebar หมวดหมู่ */
 .category-sidebar {
-  width: 15%; /* ลดขนาด Sidebar ให้เล็กลง */
+  width: 15%;
   background-color: #ffe6e6;
-  padding: 5px; /* ลด padding ให้เล็กลง */
+  padding: 5px;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  box-sizing: border-box;
+  height: 100%;
   overflow-y: auto;
 }
 
 .category-btn {
-  padding: 8px; /* ลด padding ของปุ่มหมวดหมู่ */
-  margin: 3px 0; /* ลด margin ระหว่างปุ่ม */
+  padding: 8px;
+  margin: 3px 0;
   background-color: #ff7f7f;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   text-align: left;
-  font-size: 14px; /* ลดขนาดฟอนต์ */
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.category-btn:hover {
+  background-color: #ff4d4d;
 }
 
 .category-btn.active {
   background-color: #ff4d4d;
+  font-weight: bold;
 }
 
 /* เมนูรายการสินค้า */
 .menu {
   flex: 1;
-  padding: 10px; /* ลด padding ของเมนู */
+  padding: 10px;
   background-color: #fff5f5;
   overflow-y: auto;
 }
 
-/* ปรับความกว้างของกรอบรายการสินค้าให้เล็กลง */
 .menu-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background-color: #fff;
-  padding: 10px;
-  margin-bottom: 10px;
   border: 1px solid #ffd1d1;
   border-radius: 5px;
-  font-size: 16px; /* ขนาดตัวอักษรที่เหมาะสม */
-  width: 50%; /* กำหนดความกว้างให้เหลือครึ่งหนึ่งของปัจจุบัน */
-  margin-left: auto;
-  margin-right: auto;
-
-}
-
-.quantity-controls {
+  margin-bottom: 10px;
+  padding: 10px;
+  text-align: center;
+  font-size: 16px;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.quantity-btn {
-  background-color: transparent;
-  color: #ff4d4d;
-  border: none;
-  cursor: pointer;
-  font-size: 16px; /* ลดขนาดฟอนต์ของปุ่มควบคุมจำนวน */
-  padding: 3px; /* ลด padding */
+.menu-item img {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  margin-bottom: 10px;
 }
 
-/* ปรับขนาดปุ่มยืนยันให้เล็กลงและมีขนาดตามข้อความ */
 .confirm-btn {
   background-color: #4CAF50;
   color: white;
   border: none;
-  padding: 3px 6px; /* ลดขนาด padding ของปุ่มยืนยัน */
+  padding: 6px 10px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 10px; /* ลดขนาดฟอนต์ */
-  width: auto; /* ขนาดปุ่มตามความกว้างของข้อความ */
-  min-width: 50px; /* ลดความกว้างขั้นต่ำ */
-  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
-  margin-left: 3px; /* ลดระยะห่างระหว่างปุ่มกับส่วนควบคุมจำนวน */
-  flex-shrink: 0; /* ป้องกันไม่ให้ปุ่มหดตัว */
+  font-size: 12px;
+  transition: background-color 0.3s ease;
 }
 
-/* Sidebar ตะกร้าสินค้า */
+.confirm-btn:hover {
+  background-color: #45a049;
+}
+
+/* ตะกร้าสินค้า */
 .cart {
   position: fixed;
   top: 0;
-  right: -250px; /* ลดความกว้างของตะกร้าสินค้า */
+  right: -250px;
   width: 250px;
   height: 100vh;
   background-color: #fff5f5;
   box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
-  padding: 10px; /* ลด padding */
+  padding: 10px;
   transition: right 0.3s ease;
   overflow-y: auto;
 }
@@ -117,42 +113,51 @@ html, body {
   right: 0;
 }
 
-.checkout-btn {
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ffd1d1;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.quantity-btn {
   background-color: #ff4d4d;
   color: white;
   border: none;
-  padding: 8px; /* ลด padding ของปุ่ม */
-  width: 100%;
+  padding: 4px 8px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 12px; /* ลดขนาดฟอนต์ */
+  font-size: 12px;
+  transition: background-color 0.3s ease;
 }
 
-.close-cart-btn {
-  background-color: #ff7f7f;
+.quantity-btn:hover {
+  background-color: #e63b3b;
+}
+
+.checkout-btn, .close-cart-btn {
+  background-color: #ff4d4d;
   color: white;
   border: none;
-  padding: 8px; /* ลด padding ของปุ่ม */
+  padding: 8px;
   width: 100%;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 5px; /* ลดระยะห่าง */
-  font-size: 12px; /* ลดขนาดฟอนต์ */
+  font-size: 12px;
+  margin-top: 5px;
+  transition: background-color 0.3s ease;
 }
 
-/* หน้า Payment และ Thank You */
-.payment, .thank-you {
-  text-align: center;
-  margin: 0 auto;
-  padding: 15px; /* ลด padding */
-  background-color: #fff5f5;
-  max-width: 500px; /* ลดความกว้าง */
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  font-size: 14px; /* ลดขนาดฟอนต์ */
+.checkout-btn:hover, .close-cart-btn:hover {
+  background-color: #e63b3b;
 }
 
-/* ป๊อปอัปขอบคุณ */
+/* Popup */
 .popup {
   position: fixed;
   top: 0;
@@ -168,98 +173,27 @@ html, body {
 
 .popup-content {
   background-color: white;
-  padding: 15px; /* ลด padding */
+  padding: 20px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 250px; /* ลดความกว้าง */
+  width: 300px;
 }
 
 .close-popup-btn {
-  margin-top: 8px;
-  padding: 6px 12px; /* ลด padding ของปุ่มปิด */
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px; /* ลดขนาดฟอนต์ */
-}
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup-content {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 250px;
-}
-
-.close-popup-btn {
-  margin-top: 8px;
-  padding: 6px 12px;
+  margin-top: 10px;
+  padding: 8px 12px;
   background-color: #ff4d4d;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 12px;
-}
-/* ป๊อปอัปการชำระเงินขนาดใหญ่ */
-.popup.large-popup .popup-content {
-  width: 80%;
-  height: 80%;
-  padding: 40px;
-  font-size: 18px;
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  text-align: left;
+  transition: background-color 0.3s ease;
 }
 
-/* ป๊อปอัปเรียกพนักงานสำเร็จแล้ว */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup-content {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 250px;
-}
-
-.close-popup-btn {
-  margin-top: 8px;
-  padding: 6px 12px;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px;
+.close-popup-btn:hover {
+  background-color: #e63b3b;
 }
 
 /* ปุ่มเรียกพนักงาน */
@@ -273,12 +207,28 @@ html, body {
   cursor: pointer;
   width: 100%;
   margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+.call-staff-btn {
+  background-color: #1e9bd9;
+  color: white;
+  border: none;
+  padding: 10px 20px; /* ปรับขนาด padding */
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: auto; /* ขนาดปุ่มตามข้อความ */
+  white-space: nowrap; /* ป้องกันข้อความตัดบรรทัด */
+  margin: 10px auto; /* จัดให้อยู่ตรงกลาง */
+  display: block; /* แสดง block เพื่อให้อยู่ตรงกลาง */
+  text-align: center;
+  transition: background-color 0.3s ease;
 }
 
-/* ข้อความพนักงานกำลังเดินทางมา */
-.call-staff-btn + p {
-  color: green;
+.call-staff-btn:hover {
+  background-color: #18465e;
 }
+
 
 
 
