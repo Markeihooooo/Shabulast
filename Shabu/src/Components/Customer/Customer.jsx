@@ -187,9 +187,12 @@ const CustomerPage = () => {
       </div>
 
       {/* Cart */}
-      <div className={`cart ${isCartOpen ? 'open' : ''}`}>
-  <button onClick={() => setIsCartOpen(false)} className="close-btn">ปิด</button>
-  <h2 className="cart-title">ตะกร้าสินค้า</h2>
+{/* Cart */}
+<div className={`cart ${isCartOpen ? 'open' : ''}`}>
+  <div className="cart-header">
+    <h2 className="cart-title">ตะกร้าสินค้า</h2>
+    <button onClick={() => setIsCartOpen(false)} className="close-btn">ปิด</button>
+  </div>
   {cart.length === 0 ? (
     <p>ไม่มีสินค้าในตะกร้า</p>
   ) : (
@@ -198,30 +201,29 @@ const CustomerPage = () => {
         <div key={item.id} className="cart-item">
           <h3>{item.category_item_name}</h3>
           <p>จำนวน: {item.quantity}</p>
-          <button onClick={() => updateCart(item, -1)}>-</button>
-          <button onClick={() => updateCart(item, 1)}>+</button>
+          <button onClick={() => updateCart(item, -1)} className="quantity-btn">-</button>
+          <button onClick={() => updateCart(item, 1)} className="quantity-btn">+</button>
         </div>
       ))}
-      {/* ปุ่มอยู่ใน Container กึ่งกลาง */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
-  <button
-    onClick={handleCheckout}
-    className="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-700 mb-4"
-    style={{ width: '80%' }}
-  >
-    สั่งอาหาร
-  </button>
-  <button
-    onClick={handleCallStaff}
-    className="call-staff-btn"
-  >
-    เรียกพนักงานเพื่อชำระเงิน
-  </button>
-</div>
-
+        <button
+          onClick={handleCheckout}
+          className="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-700 mb-4"
+          style={{ width: '80%' }}
+        >
+          สั่งอาหาร
+        </button>
+        <button
+          onClick={handleCallStaff}
+          className="call-staff-btn"
+        >
+          เรียกพนักงานเพื่อชำระเงิน
+        </button>
+      </div>
     </div>
   )}
 </div>
+
 
     </div>
   );
