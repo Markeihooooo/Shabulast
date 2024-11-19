@@ -206,7 +206,7 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
     return (
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogOverlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-            <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 shadow-lg w-96 max-w-[90vw]">
+            <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 shadow-lg z-50 w-[600px] ">
                 <DialogTitle className="text-xl font-bold mb-4" aria-labelledby="dialog-title">
                     แก้ไขหมวดหมู่
                 </DialogTitle>
@@ -228,7 +228,7 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
                             autoFocus
                             disabled={loading}
                         />
-                        
+
                         <p className="text-sm text-gray-500">
                             {categoryName.length}/{MAX_CATEGORY_LENGTH} ตัวอักษร
                         </p>
@@ -251,11 +251,11 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
                         </p>
                     )}
 
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex justify-between gap-2 pt-2">
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                            className="flex m-3 px-6 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors "
                             disabled={loading}
                         >
                             ยกเลิก
@@ -264,7 +264,7 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
                             type="submit"
                             onClick={handleSave}
                             disabled={loading}
-                            className="flex-1 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+                            className="flex m-3 px-6 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
