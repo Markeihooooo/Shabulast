@@ -6,8 +6,9 @@ const LoginRouter = require('./routes/Login');
 const orderRoutes = require('./routes/Order');  // นำเข้า orderRoutes จากไฟล์ Order.js
 const CategoryRouter = require('./routes/Category');
 const ItemCategoryRouter = require('./routes/ItemCategory');
+const TableCustomer = require('./routes/TableCustomer');
 
-const path = require('path'); // เพิ่มการ import โมดูล path
+const path = require('path');  // เพิ่มการ import โมดูล path
 
 
 dotenv.config();
@@ -47,6 +48,7 @@ app.use('/login', LoginRouter);
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
 app.use('/category', CategoryRouter);
 app.use('/itemCategory', ItemCategoryRouter);
+app.use('/tableCustomer', TableCustomer);
 
 
 // เริ่มเซิร์ฟเวอร์
