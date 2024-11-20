@@ -16,6 +16,9 @@ const CustomerPage = () => {
   const [items, setItems] = useState([]);
   const [tablenumber, setTablenumber] = useState(null);
   const [countnumber, setCountnumber] = useState(null);
+  
+  // For Popup
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -97,8 +100,13 @@ const CustomerPage = () => {
   }, [cart]);
 
   const handleCheckout = () => {
-    alert("Order placed successfully!");
-    setIsCartOpen(false);
+    setShowPopup(true);  // Show the popup
+    setIsCartOpen(false);  // Close the cart
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);  // Close the popup when the user clicks "ตกลง"
+    setCart([]);  // Clear the cart after the order is placed
   };
 
   const handleNextCategoryPage = () => {
@@ -113,7 +121,7 @@ const CustomerPage = () => {
           <div className="flex flex-col justify-center items-center space-x-4 p-4 bg-red-100">
             <img
               src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png"
-              alt=""
+              alt="logo"
               className="w-20 h-20 object-contain"
             />
             <h2 className="text-xl font-extrabold text-red-700 tracking-wide">หมวดหมู่อาหาร</h2>
@@ -184,61 +192,71 @@ const CustomerPage = () => {
 
       {/* Cart */}
       <div className={`cart ${isCartOpen ? 'open' : ''}`}>
-  <div className="cart-header">
-    <h2 className="cart-title">ตะกร้าสินค้า</h2>
-    <button onClick={() => setIsCartOpen(false)} className="close-btn">
-      ปิด
-    </button>
-  </div>
-  {cart.length === 0 ? (
-    <p>ไม่มีสินค้าในตะกร้า</p>
-  ) : (
-    <div>
-      {cart.map((item, index) => (
-        <div key={index} className="cart-item relative">
-          {/* ปุ่มลบ */}
-          <button
-            onClick={() =>
-              setCart(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))
-            }
-            className="delete-btn absolute top-0 right-0"
-          >
-            ลบ
+        <div className="cart-header">
+          <h2 className="cart-title">ตะกร้าสินค้า</h2>
+          <button onClick={() => setIsCartOpen(false)} className="close-btn">
+            ปิด
           </button>
-          <h3>{item.category_item_name}</h3>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => updateQuantity(item.id, -1)} // ลดจำนวน
-              className="quantity-btn"
-            >
-              -
-            </button>
-            <p>จำนวน: {item.quantity}</p>
-            <button onClick={() => updateQuantity(item.id, 1)} className="quantity-btn">
-              +
+        </div>
+        {cart.length === 0 ? (
+          <p>ไม่มีสินค้าในตะกร้า</p>
+        ) : (
+          <div>
+            {cart.map((item, index) => (
+              <div key={index} className="cart-item relative">
+                <button
+                  onClick={() =>
+                    setCart(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))
+                  }
+                  className="delete-btn absolute top-0 right-0"
+                >
+                  ลบ
+                </button>
+                <h3>{item.category_item_name}</h3>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => updateQuantity(item.id, -1)}
+                    className="quantity-btn"
+                  >
+                    -
+                  </button>
+                  <p>จำนวน: {item.quantity}</p>
+                  <button onClick={() => updateQuantity(item.id, 1)} className="quantity-btn">
+                    +
+                  </button>
+                </div>
+              </div>
+            ))}
+            <div className="flex flex-col items-center mt-4">
+              <button
+                onClick={handleCheckout}
+                className="checkout-btn"
+                style={{ width: '80%' }}
+              >
+                สั่งอาหาร
+              </button>
+              <button
+                className="call-staff-btn"
+                style={{ width: '80%' }}
+              >
+                เรียกพนักงานเพื่อชำระเงิน
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Popup */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>สั่งอาหารสำเร็จแล้ว!</h3>
+            <button onClick={handleClosePopup} className="popup-btn">
+              ตกลง
             </button>
           </div>
         </div>
-      ))}
-      <div className="flex flex-col items-center mt-4">
-        <button
-          onClick={handleCheckout}
-          className="checkout-btn"
-          style={{ width: '80%' }}
-        >
-          สั่งอาหาร
-        </button>
-        <button
-          className="call-staff-btn"
-          style={{ width: '80%' }}
-        >
-          เรียกพนักงานเพื่อชำระเงิน
-        </button>
-      </div>
-    </div>
-  )}
-</div>
-
+      )}
     </div>
   );
 };
