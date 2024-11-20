@@ -10,41 +10,41 @@ const OrderPage = () => {
     const fetchOrderData = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`http://localhost:3001/order-details/pending-orders`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch data from API");
-          }
-          const data = await response.json();
-          
-          console.log(data); // ตรวจสอบข้อมูลที่ได้รับจาก API
-      
-          // การจัดกลุ่มคำสั่งซื้อ
-          const groupedOrders = data.reduce((acc, order) => {
-            if (!acc[order.order_id]) {
-              acc[order.order_id] = {
-                order_id: order.order_id,
-                table_name: order.table_name,
-                order_create_at: order.order_create_at,
-                order_status: order.order_status,
-                items: []
-              };
+            const response = await fetch(`http://localhost:3001/order-details/pending-orders`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch data from API");
             }
-            acc[order.order_id].items.push({
-              category_item_name: order.category_item_name,
-              quantity: order.quantity
-            });
-            return acc;
-          }, {});
-      
-          const filteredOrders = Object.values(groupedOrders).filter(order => order.order_status !== "Completed");
-      
-          setOrders(filteredOrders);
+            const data = await response.json();
+
+            console.log(data); // ตรวจสอบข้อมูลที่ได้รับจาก API
+
+            // การจัดกลุ่มคำสั่งซื้อ
+            const groupedOrders = data.reduce((acc, order) => {
+                if (!acc[order.order_id]) {
+                    acc[order.order_id] = {
+                        order_id: order.order_id,
+                        table_name: order.table_name,
+                        order_create_at: order.order_create_at,
+                        order_status: order.order_status,
+                        items: []
+                    };
+                }
+                acc[order.order_id].items.push({
+                    category_item_name: order.category_item_name,
+                    quantity: order.quantity
+                });
+                return acc;
+            }, {});
+
+            const filteredOrders = Object.values(groupedOrders).filter(order => order.order_status !== "Completed"&& order.order_status !== "Canceled");
+
+            setOrders(filteredOrders);
         } catch (error) {
-          console.error("Error fetching order data:", error);
+            console.error("Error fetching order data:", error);
         }
         setLoading(false);
-      };
-      
+    };
+
     // ฟังก์ชันสำหรับเปลี่ยนสถานะคำสั่งซื้อจาก Pending เป็น Completed
     const updateOrderStatus = async (order_id) => {
         try {
