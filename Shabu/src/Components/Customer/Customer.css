@@ -232,17 +232,21 @@ html, body {
   background-color: #18465e;
 }
 /* สไตล์ส่วนหัวของตะกร้า */
+/* ตะกร้าสินค้า */
 .cart {
   position: fixed;
   top: 0;
-  right: -250px;
-  width: 250px;
+  right: -350px; /* ขยายพื้นที่ตะกร้า */
+  width: 350px; /* ขยายขนาดตะกร้า */
   height: 100vh;
   background-color: #fff5f5;
   box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  padding: 20px;
   transition: right 0.3s ease;
   overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
 }
 
 .cart.open {
@@ -259,7 +263,7 @@ html, body {
 }
 
 .cart-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   color: #ff4d4d;
 }
@@ -268,7 +272,7 @@ html, body {
   background-color: transparent;
   color: #ff4d4d;
   border: none;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
   transition: color 0.3s ease;
 }
@@ -277,6 +281,99 @@ html, body {
   color: #e63b3b;
 }
 
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ffd1d1;
+  border-radius: 8px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item h3 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.cart-item p {
+  margin: 0;
+  color: #777;
+}
+
+.cart-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.cart-item .quantity-btn {
+  background-color: transparent;
+  color: #ff4d4d;
+  border: none;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.cart-item .quantity-btn:hover {
+  color: #e63b3b;
+  transform: scale(1.2);
+}
+
+/* ปุ่มสั่งซื้อ */
+.checkout-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-btn:hover {
+  background-color: #45a049;
+}
+
+/* ปุ่มเรียกพนักงาน */
+.call-staff-btn {
+  background-color: #1e9bd9;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.call-staff-btn:hover {
+  background-color: #18465e;
+}
+
+/* ยอดรวมตะกร้า */
+.cart-total {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  color: #ff4d4d;
+}
 
 
 
