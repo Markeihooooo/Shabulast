@@ -129,19 +129,22 @@ html, body {
   background-color: transparent; /* พื้นหลังโปร่งใส */
   color: #ff4d4d; /* สีตัวอักษร */
   border: none; /* ไม่มีกรอบ */
-  font-size: 20px; /* ขนาดตัวอักษรใหญ่ขึ้น */
+  font-size: 30px; /* ขนาดตัวอักษรใหญ่ขึ้น */
   font-weight: bold;
-  margin: 0 5px; /* ระยะห่างระหว่างปุ่ม */
+  margin: 0 10px; /* ระยะห่างระหว่างปุ่ม */
+  padding: 5px; /* เพิ่มพื้นที่ภายในปุ่ม */
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .quantity-btn:hover {
-  color: #e63b3b; /* สีตัวอักษรเมื่อ hover */
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
+  color: #e63b3b;
+  transform: scale(1.2); /* ขยายเล็กน้อยเมื่อ hover */
 }
 
-
+.quantity-btn:active {
+  transform: scale(1.1); /* ขยายเมื่อกด */
+}
 
 .checkout-btn, .close-cart-btn {
   background-color: #ff4d4d;
@@ -199,45 +202,12 @@ html, body {
   background-color: #e63b3b;
 }
 
-/* ปุ่มเรียกพนักงาน */
-.call-staff-btn {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
-}
-.call-staff-btn {
-  background-color: #1e9bd9;
-  color: white;
-  border: none;
-  padding: 10px 20px; /* ปรับขนาด padding */
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: auto; /* ขนาดปุ่มตามข้อความ */
-  white-space: nowrap; /* ป้องกันข้อความตัดบรรทัด */
-  margin: 10px auto; /* จัดให้อยู่ตรงกลาง */
-  display: block; /* แสดง block เพื่อให้อยู่ตรงกลาง */
-  text-align: center;
-  transition: background-color 0.3s ease;
-}
-
-.call-staff-btn:hover {
-  background-color: #18465e;
-}
-/* สไตล์ส่วนหัวของตะกร้า */
-/* ตะกร้าสินค้า */
+/* สไตล์ส่วนหัวของตะกร้าสินค้า */
 .cart {
   position: fixed;
   top: 0;
   right: -350px; /* ขยายพื้นที่ตะกร้า */
-  width: 350px; /* ขยายขนาดตะกร้า */
+  width: 300px; /* ขยายขนาดตะกร้า */
   height: 100vh;
   background-color: #fff5f5;
   box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
@@ -268,17 +238,19 @@ html, body {
   color: #ff4d4d;
 }
 
+/* ปุ่มปิดในตะกร้าสินค้า */
 .close-btn {
   background-color: transparent;
   color: #ff4d4d;
   border: none;
   font-size: 20px;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .close-btn:hover {
-  color: #e63b3b;
+  color: #e63b3b; /* สีตัวอักษรเมื่อ hover */
+  background-color: rgba(0, 0, 0, 0.1); /* เพิ่มพื้นหลังเป็นสีคล้ำๆ */
 }
 
 .cart-item {
@@ -345,9 +317,9 @@ html, body {
   background-color: #45a049;
 }
 
-/* ปุ่มเรียกพนักงาน */
+/* ปุ่มเรียกพนักงานเพื่อชำระเงิน */
 .call-staff-btn {
-  background-color: #1e9bd9;
+  background-color: #1e9bd9; /* สีฟ้า */
   color: white;
   border: none;
   padding: 12px;
@@ -360,21 +332,33 @@ html, body {
 }
 
 .call-staff-btn:hover {
-  background-color: #18465e;
+  background-color: #18465e; /* สีฟ้าเข้มเมื่อ hover */
 }
-
-/* ยอดรวมตะกร้า */
-.cart-total {
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 20px;
+.cart-item {
+  position: relative; /* ทำให้สามารถใช้ position:absolute ได้ภายใน */
+  background-color: #f9f9f9;
   padding: 10px;
-  background-color: #f8f8f8;
-  border-radius: 5px;
-  color: #ff4d4d;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
+.delete-btn {
+  position: absolute;
+  top: 0; /* ปรับให้ไปที่ขอบบนสุด */
+  right: 0; /* ปรับให้ไปที่ขอบขวาสุด */
+  background-color: #f87171; /* สีแดง */
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 30%; /* ปุ่มลักษณะวงกลม */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 12px;
+  line-height: 1;
+}
 
-
+.delete-btn:hover {
+  background-color: #dc2626; /* สีแดงเข้มเมื่อ hover */
+}
 

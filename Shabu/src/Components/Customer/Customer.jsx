@@ -184,48 +184,63 @@ const CustomerPage = () => {
 
       {/* Cart */}
       <div className={`cart ${isCartOpen ? 'open' : ''}`}>
-        <div className="cart-header">
-          <h2 className="cart-title">ตะกร้าสินค้า</h2>
-          <button onClick={() => setIsCartOpen(false)} className="close-btn">
-            ปิด
+  <div className="cart-header">
+    <h2 className="cart-title">ตะกร้าสินค้า</h2>
+    <button onClick={() => setIsCartOpen(false)} className="close-btn">
+      ปิด
+    </button>
+  </div>
+  {cart.length === 0 ? (
+    <p>ไม่มีสินค้าในตะกร้า</p>
+  ) : (
+    <div>
+      {cart.map((item, index) => (
+        <div key={index} className="cart-item relative">
+          {/* ปุ่มลบ */}
+          <button
+            onClick={() =>
+              setCart(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))
+            }
+            className="delete-btn absolute top-0 right-0"
+          >
+            ลบ
           </button>
-        </div>
-        {cart.length === 0 ? (
-          <p>ไม่มีสินค้าในตะกร้า</p>
-        ) : (
-          <div>
-            {cart.map((item, index) => (
-              <div key={index} className="cart-item">
-                <h3>{item.category_item_name}</h3>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => updateQuantity(item.id, -1)} // ลดจำนวน
-                    className="quantity-btn"
-                  >
-                    -
-                  </button>
-                  <p>จำนวน: {item.quantity}</p>
-                  <button onClick={() => updateQuantity(item.id, 1)} className="quantity-btn">
-                    +
-                  </button>
-                </div>
-              </div>
-            ))}
-            <div className="flex flex-col items-center mt-4">
-              <button
-                onClick={handleCheckout}
-                className="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-700 mb-4"
-                style={{ width: '80%' }}
-              >
-                สั่งอาหาร
-              </button>
-            </div>
+          <h3>{item.category_item_name}</h3>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => updateQuantity(item.id, -1)} // ลดจำนวน
+              className="quantity-btn"
+            >
+              -
+            </button>
+            <p>จำนวน: {item.quantity}</p>
+            <button onClick={() => updateQuantity(item.id, 1)} className="quantity-btn">
+              +
+            </button>
           </div>
-        )}
+        </div>
+      ))}
+      <div className="flex flex-col items-center mt-4">
+        <button
+          onClick={handleCheckout}
+          className="checkout-btn"
+          style={{ width: '80%' }}
+        >
+          สั่งอาหาร
+        </button>
+        <button
+          className="call-staff-btn"
+          style={{ width: '80%' }}
+        >
+          เรียกพนักงานเพื่อชำระเงิน
+        </button>
       </div>
+    </div>
+  )}
+</div>
+
     </div>
   );
 };
 
 export default CustomerPage;
-``
