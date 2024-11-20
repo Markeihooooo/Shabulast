@@ -195,8 +195,8 @@ const ReceiveCustomer = () => {
     setQrCodeUrl(url);
   };
 
-  const generateToken = (table, count) => {
-    return btoa(`${table}-${count}-${Date.now()}`);
+  const generateToken = (table_number, customer_count) => {
+    return btoa(`${table_number}-${customer_count}-${Date.now()}`);
   };
 
   const handleTableClick = (num) => {
