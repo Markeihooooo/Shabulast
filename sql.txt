@@ -31,18 +31,18 @@ CREATE TABLE Category_item (
     update_at TIMESTAMP
 );
 
+-- ตาราง Table (เปลี่ยนชื่อเป็น TableInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
+CREATE TABLE TableInfo (
+    table_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    table_name VARCHAR(50) NOT NULL 
+);
+
 -- ตาราง Order (เปลี่ยนชื่อเป็น OrderInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
 CREATE TABLE OrderInfo (
     order_id SERIAL PRIMARY KEY,
     status VARCHAR(50) NOT NULL,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     table_id UUID REFERENCES TableInfo(table_id) ON DELETE SET NULL  -- เชื่อมโยงกับ TableInfo
-);
-
--- ตาราง Table (เปลี่ยนชื่อเป็น TableInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
-CREATE TABLE TableInfo (
-    table_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    table_name VARCHAR(50) NOT NULL 
 );
 
 -- ตาราง Order_item

@@ -43,23 +43,23 @@ async function seed() {
     ('ไอศกรีม', 20, 'https://www.hfocus.org/sites/default/files/u11/shutterstock_13847400822.jpg', 3, 1)
     `);
 
-        // เพิ่มข้อมูลใน TableInfo
-        await pool.query(`
-          INSERT INTO TableInfo (table_id, table_name)  
-          VALUES 
+    // เพิ่มข้อมูลใน TableInfo
+    await pool.query(`
+      INSERT INTO TableInfo (table_id, table_name)  
+        VALUES 
           (gen_random_uuid(),'1'),
           (gen_random_uuid(),'1'),
           (gen_random_uuid(),'3')
-        `);
+    `);
 
 
     // เพิ่มข้อมูลใน OrderInfo
     await pool.query(`
-        INSERT INTO OrderInfo (status, table_name , create_at) 
+        INSERT INTO OrderInfo (status,  create_at) 
         VALUES 
-        ('Pending', '1', NOW()),
-        ('Pending', '1', NOW()),
-        ('Pending', '3', NOW())
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
+        ('Pending',  NOW())
         
       `);
 
@@ -84,7 +84,7 @@ async function seed() {
 
     `);
 
-    
+
 
     console.log("Seeding completed successfully!");
     process.exit(0); // ออกจากกระบวนการเมื่อเสร็จสมบูรณ์
