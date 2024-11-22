@@ -43,25 +43,27 @@ async function seed() {
     ('ไอศกรีม', 20, 'https://www.hfocus.org/sites/default/files/u11/shutterstock_13847400822.jpg', 3, 1)
     `);
 
+    // เพิ่มข้อมูลใน TableInfo
+    await pool.query(`
+      INSERT INTO TableInfo (table_id, table_name)  
+        VALUES 
+          (gen_random_uuid(),'1'),
+          (gen_random_uuid(),'1'),
+          (gen_random_uuid(),'3')
+    `);
+
+
     // เพิ่มข้อมูลใน OrderInfo
     await pool.query(`
-        INSERT INTO OrderInfo (status, create_at) 
+        INSERT INTO OrderInfo (status,  create_at) 
         VALUES 
-        ('Completed', NOW()),
-        ('pending', NOW()),
-        ('Canceled', NOW())
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
+        ('Pending',  NOW())
         
       `);
 
-    // เพิ่มข้อมูลใน TableInfo
-    await pool.query(`
-      INSERT INTO TableInfo (table_id, order_id, table_name)  
-      VALUES 
-      (gen_random_uuid(), 1, '1'),
-      (gen_random_uuid(), 2, '2'),
-      (gen_random_uuid(), 3, '3'),
-      (gen_random_uuid(), 3, '4')
-    `);
+
 
     // เพิ่มข้อมูลใน Bill
     await pool.query(`
@@ -77,11 +79,12 @@ async function seed() {
       VALUES
       (1, 10, 1), --เลขตำแหน่งที่ 1 คือ รายการอาหาร เลขตำแหน่งที่ 2 คือ จํานวน 10 ชิ้น เลขตำแหน่งที่ 3 คือ เลขออเดอร์ที่ 1
       (1, 10, 2),
+      (1, 10, 3),
       (2, 10, 2)
 
-    
-      
     `);
+
+
 
     console.log("Seeding completed successfully!");
     process.exit(0); // ออกจากกระบวนการเมื่อเสร็จสมบูรณ์
