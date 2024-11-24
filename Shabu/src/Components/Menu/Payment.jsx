@@ -95,6 +95,7 @@ const Payment = () => {
     }
   };
 
+
   // ฟังก์ชันพิมพ์ใบเสร็จ
   const handlePrintReceipt = () => {
     if (!selectedTable) return;
