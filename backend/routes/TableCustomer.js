@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
       
       // ส่งข้อมูลที่ดึงได้กลับเป็น JSON
       res.status(200).json(result.rows);
-      console.log(result.rows); // พิมพ์ข้อมูลใน console
+      //console.log(result.rows); // พิมพ์ข้อมูลใน console
     } catch (error) {
       console.error('Error fetching employee:', error);
       res.status(500).json({ error: 'Internal Server Error' }); // ส่ง error ถ้ามีปัญหา
