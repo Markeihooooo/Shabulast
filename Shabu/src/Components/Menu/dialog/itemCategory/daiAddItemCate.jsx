@@ -49,8 +49,16 @@ const CreateItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId }) =>
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setSelectedFile(file);
-            setImagePreview(URL.createObjectURL(file));
+            const fileType = file.type.split('/')[0];
+            if (fileType !== 'image') {
+                setError('กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น');
+                setSelectedFile(null);
+                setImagePreview(null);
+            } else {
+                setSelectedFile(file);
+                setImagePreview(URL.createObjectURL(file));
+                setError('');
+            }
         }
     };
 
@@ -86,7 +94,6 @@ const CreateItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId }) =>
             const formData = new FormData();
             formData.append('category_item_name', categoryName.trim());
             formData.append('category_id', categoryId);
-            formData.append('category_item_balance', balance);
             formData.append('image', selectedFile);
 
             const response = await axios.post('http://localhost:3001/itemCategory/create', formData, {
@@ -107,6 +114,7 @@ const CreateItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId }) =>
         } catch (err) {
             const errorMessage =
                 err.response?.data?.error || err.response?.data?.message || 'เกิดข้อผิดพลาดในคำขอ';
+            console.log('Error:', errorMessage); // พิมพ์ข้อความผิดพลาดใน console
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -142,18 +150,7 @@ const CreateItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId }) =>
                             {categoryName.length}/{MAX_CATEGORY_LENGTH} ตัวอักษร
                         </p>
                     </div>
-                    <div style={{ marginBottom: "16px" }}>
-                        <label>จำนวนคงเหลือ : &nbsp;</label>
-                        <input
-                            type="number"
-                            name="category_item_balance"
-                            value={balance} // แสดงค่าปัจจุบันของ balance
-                            onChange={handleBalanceChange} // ใช้ฟังก์ชันจัดการการเปลี่ยนแปลง balance
-                            min="0"
-                            className='border border-gray-300 rounded-md px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-1/4'
-                            required
-                        />
-                    </div>
+
                     <div>
                         <label>เลือกรูปภาพ : </label>
                         <input
@@ -163,25 +160,26 @@ const CreateItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId }) =>
                             onChange={handleFileChange}
                             style={{ marginTop: "8px" }}
                         />
-                        {imagePreview && ( // แสดงตัวอย่างรูปภาพถ้ามีการอัปโหลด
-                            <div style={{ marginTop: "16px" }}>
+                        {imagePreview && (
+                            <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <img
                                     src={imagePreview}
                                     alt="Preview"
-                                    style={{ maxWidth: "100%", height: "120px", border: "1px solid #ccc" }}
+                                    className='w-auto h-44 object-cover'
                                 />
                             </div>
                         )}
                     </div>
+
                     {error && (
                         <p className="text-sm text-red-500 bg-red-50 p-2 rounded">
-                            {typeof error === 'string' ? error : JSON.stringify(error)} {/* แปลง error เป็น string ถ้าไม่ใช่ */}
+                            {typeof error === 'string' ? error : JSON.stringify(error)}
                         </p>
                     )}
 
                     {success && (
                         <p className="text-sm text-green-500 bg-green-50 p-2 rounded">
-                            {typeof success === 'string' ? success : JSON.stringify(success)} {/* แปลง success เป็น string ถ้าไม่ใช่ */}
+                            {typeof success === 'string' ? success : JSON.stringify(success)}
                         </p>
                     )}
 
