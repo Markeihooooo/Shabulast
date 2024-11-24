@@ -57,10 +57,10 @@ router.post('/add-bill', async (req, res) => {
 
         const table_id = tableInfoResult.rows[0].table_id;
 
-        // เพิ่มข้อมูลใน Bill
+        // เพิ่มข้อมูลใน Bill พร้อมทั้งเพิ่มเวลาการสร้างบิล (create_at)
         const insertQuery = `
-            INSERT INTO Bill (customer_count, table_id, create_by)
-            VALUES ($1, $2, $3)
+            INSERT INTO Bill (customer_count, table_id, create_by, create_at)
+            VALUES ($1, $2, $3, NOW())  -- ใช้ NOW() เพื่อบันทึกเวลาปัจจุบัน
             RETURNING bill_id
         `;
 
@@ -68,13 +68,13 @@ router.post('/add-bill', async (req, res) => {
 
         const bill_id = insertResult.rows[0].bill_id;
 
-        // อัปเดต bill
+        // อัปเดตสถานะการชำระเงินและเวลาออกจากร้าน (checkout)
         const updateQuery = `
             UPDATE Bill
             SET payment_status = $1,
                 checkout = $2,
                 update_by = $3,
-                update_at = NOW()
+                update_at = NOW()  -- ใช้ NOW() เพื่อบันทึกเวลาปัจจุบันในการอัปเดต
             WHERE bill_id = $4
             RETURNING *
         `;
@@ -92,6 +92,7 @@ router.post('/add-bill', async (req, res) => {
         res.status(500).json({ success: false, message: 'Database error occurred' });
     }
 });
+
 
 
 module.exports = router;
