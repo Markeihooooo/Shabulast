@@ -10,7 +10,7 @@ router.get('/',(req,res)=>{
 router.get('/get', async (req, res) => {
     try {
       // query ฐานข้อมูลเพื่อดึงข้อมูลจากตาราง employee
-      const result = await pool.query('SELECT bill_id,customer_count,TO_CHAR(create_at, \'YYYY-MM-DD\')FROM public."bill"');
+      const result = await pool.query('SELECT bill_id,customer_count,TO_CHAR(create_at, \'YYYY-MM-DD HH24:MI:SS\')FROM public."bill"');
       
       // ส่งข้อมูลที่ดึงได้กลับเป็น JSON
       res.status(200).json(result.rows);
