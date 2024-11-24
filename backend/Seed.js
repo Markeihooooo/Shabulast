@@ -48,8 +48,10 @@ async function seed() {
       INSERT INTO TableInfo (table_id, table_name)  
         VALUES 
           (gen_random_uuid(),'1'),
-          (gen_random_uuid(),'1'),
-          (gen_random_uuid(),'3')
+          (gen_random_uuid(),'2'),
+          (gen_random_uuid(),'3'),
+          (gen_random_uuid(),'4'),
+          (gen_random_uuid(),'5')
     `);
 
 

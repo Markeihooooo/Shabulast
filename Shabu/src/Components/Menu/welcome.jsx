@@ -7,7 +7,7 @@ const welcome = () => {
          <h1 className='text-4xl font-bold mb-4'>
           ยินดีต้อนรับสู่ <span className='text-[#ff6347]'>Shabu Delight</span>
         </h1>
-        <p className='text-lg max-w-lg mb-6'>
+        <p className='text-lg max-w-lg mb-6 text-red-300'>
           สัมผัสรสชาติชาบูที่ยอดเยี่ยม พร้อมวัตถุดิบสดใหม่ น้ำซุปกลมกล่อม และบรรยากาศสุดผ่อนคลาย  
           เรารังสรรค์ประสบการณ์การทานชาบูที่คุณจะไม่มีวันลืม!
         </p>
