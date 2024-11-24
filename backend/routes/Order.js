@@ -6,24 +6,28 @@ router.get('/pending-orders', (req, res) => {
     const table_name = req.query.table_name;
 
     let query = `
-      SELECT 
-        OrderInfo.order_id, 
-        OrderInfo.create_at AS order_create_at, 
-        TableInfo.table_name, 
-        Order_item.order_item_id, 
-        Category_item.category_item_name, 
-        Order_item.quantity, 
-        OrderInfo.status AS order_status 
-      FROM OrderInfo
-      LEFT JOIN TableInfo ON TableInfo.order_id = OrderInfo.order_id
-      LEFT JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
-      LEFT JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id
-    `;
+    SELECT 
+      OrderInfo.order_id, 
+      OrderInfo.create_at AS order_create_at, 
+      TableInfo.table_name, 
+      Order_item.order_item_id, 
+      Category_item.category_item_name, 
+      Order_item.quantity, 
+      OrderInfo.status AS order_status 
+    FROM OrderInfo
+    LEFT JOIN TableInfo ON TableInfo.table_id = OrderInfo.table_id 
+    LEFT JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
+    LEFT JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id
+  `;
 
+    // ถ้ามี table_name ให้กรองข้อมูล
     if (table_name) {
-        query += ` WHERE TableInfo.table_name = $1`;
+        query += ` WHERE TableInfo.table_name = $1 AND OrderInfo.status = 'Pending'`;  // เพิ่มการกรองสถานะ Pending
+    } else {
+        query += ` WHERE OrderInfo.status = 'Pending'`;  // ถ้าไม่มี table_name กรองเฉพาะสถานะ Pending
     }
 
+    // เรียกใช้ฐานข้อมูลและส่งผลลัพธ์กลับ
     pool.query(query, table_name ? [table_name] : [])
         .then(result => res.json(result.rows))
         .catch(err => {
@@ -31,6 +35,7 @@ router.get('/pending-orders', (req, res) => {
             res.status(500).json({ error: 'Internal Server Error' });
         });
 });
+
 
 router.put('/update-order-status/:order_id', async (req, res) => {
     const { order_id } = req.params;  // รับค่า order_id จาก URL
