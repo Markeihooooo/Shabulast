@@ -10,7 +10,8 @@ const ItemCategoryRouter = require('./routes/ItemCategory');
 const bodyParser = require('body-parser');
 
 const TableCustomer = require('./routes/TableCustomer');
-const PaymentRouter = require('./routes/Payment');  // ตรวจสอบว่าใช้เส้นทางที่ถูกต้อง
+const PaymentRouter = require('./routes/Payment');
+const billRouter = require('./routes/Payment'); // ตัวอย่างเส้นทางไฟล์
 const TableCustomerRouter = require('./routes/TableCustomer'); // แก้ไขเส้นทาง router สำหรับ TableCustomer
 const path = require('path');  // เพิ่มการ import โมดูล path
 
@@ -59,9 +60,8 @@ app.use('/tableCustomer', TableCustomer);
 
 // เชื่อมต่อ routes
 app.use('/tablecustomer', TableCustomerRouter);
-app.use('/api/payment', PaymentRouter); // ใช้ route สำหรับ Payment
-
-
+app.use('/api/payment', PaymentRouter);
+app.use('/api/bill', billRouter);
 
 // เริ่มเซิร์ฟเวอร์
 app.listen(3001, () => {
