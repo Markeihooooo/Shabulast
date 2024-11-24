@@ -10,7 +10,7 @@ const TableCustomer = require('./routes/TableCustomer');
 const PaymentRouter = require('./routes/Payment');  // ตรวจสอบว่าใช้เส้นทางที่ถูกต้อง
 const TableCustomerRouter = require('./routes/TableCustomer'); // แก้ไขเส้นทาง router สำหรับ TableCustomer
 const path = require('path');  // เพิ่มการ import โมดูล path
-
+const History = require ('./routes/History');
 
 dotenv.config();
 
@@ -51,7 +51,7 @@ app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้
 app.use('/category', CategoryRouter);
 app.use('/itemCategory', ItemCategoryRouter);
 app.use('/tableCustomer', TableCustomer);
-
+app.use('/history', History);
 // เชื่อมต่อ routes
 app.use('/tablecustomer', TableCustomerRouter);
 app.use('/api/payment', PaymentRouter); // ใช้ route สำหรับ Payment
