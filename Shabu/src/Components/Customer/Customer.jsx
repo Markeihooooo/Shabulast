@@ -16,8 +16,8 @@ const CustomerPage = () => {
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [items, setItems] = useState([]);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
-  const [tablenumber, setTablenumber] = useState(null); 
-  const [countnumber, setCountnumber] = useState(null); 
+  const [tablenumber, setTablenumber] = useState(null);
+  const [countnumber, setCountnumber] = useState(null);
 
 
   // Fetch categories with pagination
@@ -36,7 +36,7 @@ const CustomerPage = () => {
       fetchCategories();
     }
   }, [currentPage]); // Removed selectedCategoryId dependency
-  
+
 
   // Fetch items for a selected category
   useEffect(() => {
@@ -60,7 +60,7 @@ const CustomerPage = () => {
     setSelectedCategoryName(categoryName);
     // ไม่ต้องล้าง items ตรงนี้
   };
-  
+
   useEffect(() => {
     // ดึงค่าพารามิเตอร์จาก URL
     const searchParams = new URLSearchParams(window.location.search);
@@ -70,14 +70,14 @@ const CustomerPage = () => {
     // อัปเดต State
     setTablenumber(table);
     setCountnumber(count);
-  }, []); 
+  }, []);
 
 
   useEffect(() => {
     console.log("Current Page:", currentPage);
     console.log("Selected Category ID:", selectedCategoryId);
   }, [currentPage, selectedCategoryId]);
-  
+
 
   const updateCart = (item, delta) => {
     setCart(prevCart => {
@@ -127,7 +127,7 @@ const CustomerPage = () => {
     setSelectedCategoryId(null); // Clear selected category
     setCurrentPage(prevPage => (prevPage < totalPages ? prevPage + 1 : 1));
   };
-  
+
 
   return (
     <div>
@@ -136,10 +136,10 @@ const CustomerPage = () => {
           <div className="flex flex-col justify-center items-center space-x-4 p-4 bg-red-100">
             <img src="https://img5.pic.in.th/file/secure-sv1/Screenshot-2567-09-22-at-11.06.22-2.png" alt="" className="w-20 h-20 object-contain" />
             <h2 className="text-xl font-extrabold text-red-700 tracking-wide">หมวดหมู่อาหาร</h2>
-           
+
             <h3 className="text-s font-extrabold text-red-700 tracking-wide">โต๊ะที่: {tablenumber}</h3>
-            <h3 className="text-s font-extrabold text-red-700 tracking-wide">จํานวนคน: {countnumber}</h3> 
-           
+            <h3 className="text-s font-extrabold text-red-700 tracking-wide">จํานวนคน: {countnumber}</h3>
+
           </div>
 
           {categories.map((category) => (
@@ -147,15 +147,16 @@ const CustomerPage = () => {
               key={category.category_id}
               onClick={() => handleCategoryClick(category.category_id, category.category_name)}
               className={`px-6 py-3 mb-2 rounded-lg font-semibold text-sm transition-all duration-300 ease-in-out transform 
-              ${selectedCategoryId === category.category_id
+      ${selectedCategoryId === category.category_id
                   ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg'  // ปุ่มที่เลือก
                   : 'bg-red-400 text-white hover:bg-red-500 shadow-md'}    // ปุ่มที่ไม่ได้เลือก
-            hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2`}
+      hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2`}
+              disabled={!category.is_active}  // ปิดการใช้งานปุ่มถ้า is_active = false
             >
               {category.category_name}
             </button>
-
           ))}
+
           <button
             onClick={handleNextCategoryPage}
             className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
@@ -176,7 +177,7 @@ const CustomerPage = () => {
           </div>
           {Array.isArray(items) && items.length === 0 ? (
             <div className="flex flex-col justify-center items-center h-[500px]">
-              <p>หมวดหมู่ {selectedCategoryName} ยังไม่มีรายการอาหาร<br /></p>   
+              <p>หมวดหมู่ {selectedCategoryName} ยังไม่มีรายการอาหาร<br /></p>
               <p className="text-gray-500 text-center">บอกว่าไม่มีรายการไปสั่งอย่างอื่น!!!!</p>
             </div>
           ) : (

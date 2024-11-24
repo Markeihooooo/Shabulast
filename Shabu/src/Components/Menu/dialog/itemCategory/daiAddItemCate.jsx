@@ -1,269 +1,227 @@
-import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent } from '@radix-ui/react-dialog';
-import { Button, TextField } from "@radix-ui/themes";
-import { Text } from '@radix-ui/themes';
+import React, { useState, useCallback } from 'react';
+import axios from 'axios';
+import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogClose } from "@radix-ui/react-dialog";
+import { Loader2 } from "lucide-react";
 
-const CreateCategoryItemDialog = ({ open, onClose, categoryId, token, onItemCreated }) => {
-    const [formData, setFormData] = useState({
-        category_item_name: '',
-        category_item_balance: '',
-        image_url: null // แก้ไขให้เป็น null แทนการใช้ base64
-    });
+const MAX_CATEGORY_LENGTH = 100;
+
+const CreateItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId }) => {
+    const [categoryName, setCategoryName] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [balance, setBalance] = useState(0);
+    const [imagePreview, setImagePreview] = useState(null);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+    const resetForm = useCallback(() => {
+        setCategoryName('');
+        setError('');
+        setSuccess('');
+        setLoading(false);
+        setSelectedFile(null);
+        setBalance(0);
+        setImagePreview(null);
+    }, []);
+
+    const handleClose = useCallback(() => {
+        resetForm();
+        onClose();
+    }, [onClose, resetForm]);
+
+    const validateCategoryName = (name) => {
+        if (!name.trim()) {
+            return 'กรุณากรอกชื่อหมวดหมู่';
+        }
+        if (name.trim().length > MAX_CATEGORY_LENGTH) {
+            return `ชื่อหมวดหมู่ต้องไม่เกิน ${MAX_CATEGORY_LENGTH} ตัวอักษร`;
+        }
+        return '';
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
+    const handleCategoryNameChange = (e) => {
+        const value = e.target.value;
+        setCategoryName(value);
+        if (error) setError('');
+        if (success) setSuccess('');
+    };
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
         if (file) {
-            setFormData(prev => ({
-                ...prev,
-                image_url: file // เก็บไฟล์โดยตรง
-            }));
+            setSelectedFile(file);
+            setImagePreview(URL.createObjectURL(file));
         }
+    };
+
+    const handleBalanceChange = (e) => {
+        const value = parseInt(e.target.value, 10) || 0;
+        setBalance(value);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
 
-        const formDataToSend = new FormData();
-        formDataToSend.append('category_item_name', formData.category_item_name);
-        formDataToSend.append('category_item_balance', formData.category_item_balance);
-
-        // ตรวจสอบว่าเลือกไฟล์หรือไม่
-        if (formData.image_url) {
-            formDataToSend.append('image_url', formData.image_url); // ใช้ชื่อฟิลด์ image_url
+        const validationError = validateCategoryName(categoryName);
+        if (validationError) {
+            setError(validationError);
+            return;
         }
 
+        if (!selectedFile) {
+            setError('กรุณาอัปโหลดไฟล์รูปภาพ');
+            return;
+        }
+
+        setError('');
+        setSuccess('');
+        setLoading(true);
+
         try {
-            const response = await fetch(`http://localhost:3001/itemCategory/create/${categoryId}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formDataToSend // ส่งข้อมูลแบบ FormData
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'เกิดข้อผิดพลาดในการเพิ่มรายการ');
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('กรุณาเข้าสู่ระบบอีกครั้ง');
             }
 
-            onItemCreated && onItemCreated(data.categoryItem);
-            onClose();
-        } catch (error) {
-            setError(error.message);
+            const formData = new FormData();
+            formData.append('category_item_name', categoryName.trim());
+            formData.append('category_id', categoryId);
+            formData.append('category_item_balance', balance);
+            formData.append('image', selectedFile);
+
+            const response = await axios.post('http://localhost:3001/itemCategory/create', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            setSuccess('สร้างไอเท็มหมวดหมู่สำเร็จ');
+            if (onSuccess) {
+                onSuccess(response.data.categoryItem);
+            }
+
+            setTimeout(() => {
+                handleClose();
+            }, 1500);
+        } catch (err) {
+            const errorMessage =
+                err.response?.data?.error || err.response?.data?.message || 'เกิดข้อผิดพลาดในคำขอ';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md">
-                <DialogTitle>เพิ่มรายการอาหารใหม่</DialogTitle>
-
-                {error && (
-                    <div className="text-red-600 p-2 border border-red-500 rounded">
-                        <strong>ข้อผิดพลาด:</strong> {error}
-                    </div>
-                )}
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+            <DialogOverlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+            <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 shadow-lg z-50 w-[600px]">
+                <DialogTitle className="text-xl font-bold mb-4" aria-labelledby="dialog-title">
+                    เพิ่มรายการอาหารในหมวดหมู่
+                </DialogTitle>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid w-full gap-1.5">
-                        <Text htmlFor="category_item_name">ชื่อรายการอาหาร</Text>
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                            ชื่อรายการอาหาร
+                        </label>
                         <input
-                            id="category_item_name"
-                            name="category_item_name"
-                            value={formData.category_item_name}
-                            onChange={handleInputChange}
+                            type="text"
+                            value={categoryName}
+                            onChange={handleCategoryNameChange}
+                            className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 
+                                ${error ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="กรอกชื่อรายการอาหาร"
+                            maxLength={MAX_CATEGORY_LENGTH}
                             required
+                            autoFocus
+                            disabled={loading}
                         />
+                        <p className="text-sm text-gray-500">
+                            {categoryName.length}/{MAX_CATEGORY_LENGTH} ตัวอักษร
+                        </p>
                     </div>
-
-                    <div className="grid w-full gap-1.5">
-                        <Text htmlFor="category_item_balance">จำนวนคงเหลือ</Text>
+                    <div style={{ marginBottom: "16px" }}>
+                        <label>จำนวนคงเหลือ : &nbsp;</label>
                         <input
-                            id="category_item_balance"
-                            name="category_item_balance"
                             type="number"
-                            value={formData.category_item_balance}
-                            onChange={handleInputChange}
+                            name="category_item_balance"
+                            value={balance} // แสดงค่าปัจจุบันของ balance
+                            onChange={handleBalanceChange} // ใช้ฟังก์ชันจัดการการเปลี่ยนแปลง balance
+                            min="0"
+                            className='border border-gray-300 rounded-md px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-1/4'
                             required
                         />
                     </div>
-
-                    <div className="grid w-full gap-1.5">
-                        <Text htmlFor="image_url">เลือกรูปภาพ</Text>
+                    <div>
+                        <label>เลือกรูปภาพ : </label>
                         <input
-                            id="image_url"
-                            name="image_url"
                             type="file"
+                            name="image"
                             accept="image/*"
                             onChange={handleFileChange}
-                            required
+                            style={{ marginTop: "8px" }}
                         />
-                        {formData.image_url && (
-                            <img src={URL.createObjectURL(formData.image_url)} alt="Preview" className="mt-2" width={100} />
+                        {imagePreview && ( // แสดงตัวอย่างรูปภาพถ้ามีการอัปโหลด
+                            <div style={{ marginTop: "16px" }}>
+                                <img
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    style={{ maxWidth: "100%", height: "120px", border: "1px solid #ccc" }}
+                                />
+                            </div>
                         )}
                     </div>
+                    {error && (
+                        <p className="text-sm text-red-500 bg-red-50 p-2 rounded">
+                            {typeof error === 'string' ? error : JSON.stringify(error)} {/* แปลง error เป็น string ถ้าไม่ใช่ */}
+                        </p>
+                    )}
 
-                    <div className="flex justify-end gap-2">
-                        <Button
+                    {success && (
+                        <p className="text-sm text-green-500 bg-green-50 p-2 rounded">
+                            {typeof success === 'string' ? success : JSON.stringify(success)} {/* แปลง success เป็น string ถ้าไม่ใช่ */}
+                        </p>
+                    )}
+
+                    <div className="flex justify-between gap-2 pt-2">
+                        <button
                             type="button"
-                            variant="outline"
-                            onClick={onClose}
+                            onClick={handleClose}
+                            className="flex m-3 px-6 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors "
                             disabled={loading}
                         >
                             ยกเลิก
-                        </Button>
-                        <Button
+                        </button>
+                        <button
                             type="submit"
                             disabled={loading}
+                            className="flex m-3 px-6 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'กำลังบันทึก...' : 'บันทึก'}
-                        </Button>
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    กำลังบันทึก...
+                                </span>
+                            ) : (
+                                'บันทึก'
+                            )}
+                        </button>
                     </div>
                 </form>
+
+                <DialogClose asChild>
+                    <button
+                        className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        onClick={handleClose}
+                    >
+                        ✕
+                    </button>
+                </DialogClose>
             </DialogContent>
         </Dialog>
     );
 };
 
-export default CreateCategoryItemDialog;
-
-// import React, { useState } from 'react';
-
-// const CreateCategoryItemDialog = ({ open, onClose, categoryId, token, onItemCreated }) => {
-//     const [formData, setFormData] = useState({
-//         category_item_name: '',
-//         category_item_balance: '',
-//         image_url: ''
-//     });
-//     const [imageFile, setImageFile] = useState(null);  // สร้าง state สำหรับไฟล์รูป
-//     const [loading, setLoading] = useState(false);
-//     const [error, setError] = useState('');
-
-//     const handleInputChange = (e) => {
-//         const { name, value } = e.target;
-//         setFormData(prev => ({
-//             ...prev,
-//             [name]: value
-//         }));
-//     };
-
-//     const handleFileChange = (e) => {
-//         const file = e.target.files[0];  // รับไฟล์ที่เลือก
-//         setImageFile(file);  // เก็บไฟล์ใน state
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         setLoading(true);
-//         setError('');
-
-//         const formDataToSend = new FormData();
-//         formDataToSend.append('category_item_name', formData.category_item_name);
-//         formDataToSend.append('category_item_balance', formData.category_item_balance);
-//         formDataToSend.append('image', imageFile);  // เพิ่มไฟล์รูปภาพไปใน FormData
-
-//         try {
-//             const response = await fetch(`http://localhost:3001/itemCategory/create/${categoryId}`, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Authorization': `Bearer ${token}`
-//                 },
-//                 body: formDataToSend
-//             });
-
-//             const data = await response.json();
-
-//             if (!response.ok) {
-//                 throw new Error(data.error || 'เกิดข้อผิดพลาดในการเพิ่มรายการ');
-//             }
-
-//             onItemCreated && onItemCreated(data.categoryItem);
-//             onClose();
-//         } catch (error) {
-//             setError(error.message);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     return (
-//         <Dialog open={open} onOpenChange={onClose}>
-//             <DialogContent className="sm:max-w-md">
-//                 <DialogTitle>เพิ่มรายการอาหารใหม่</DialogTitle>
-
-//                 {error && <div className="text-red-600">{error}</div>}
-
-//                 <form onSubmit={handleSubmit} className="space-y-4">
-//                     <div className="grid w-full gap-1.5">
-//                         <Label htmlFor="category_item_name">ชื่อรายการอาหาร</Label>
-//                         <Input
-//                             id="category_item_name"
-//                             name="category_item_name"
-//                             value={formData.category_item_name}
-//                             onChange={handleInputChange}
-//                             required
-//                         />
-//                     </div>
-
-//                     <div className="grid w-full gap-1.5">
-//                         <Label htmlFor="category_item_balance">จำนวนคงเหลือ</Label>
-//                         <Input
-//                             id="category_item_balance"
-//                             name="category_item_balance"
-//                             type="number"
-//                             value={formData.category_item_balance}
-//                             onChange={handleInputChange}
-//                             required
-//                         />
-//                     </div>
-
-//                     <div className="grid w-full gap-1.5">
-//                         <Label htmlFor="image">เลือกรูปภาพ</Label>
-//                         <input
-//                             type="file"
-//                             accept="image/*"
-//                             onChange={handleFileChange}
-//                             className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                             disabled={loading}
-//                         />
-//                     </div>
-
-//                     <div className="flex justify-end gap-2">
-//                         <Button
-//                             type="button"
-//                             variant="outline"
-//                             onClick={onClose}
-//                             disabled={loading}
-//                         >
-//                             ยกเลิก
-//                         </Button>
-//                         <Button
-//                             type="submit"
-//                             disabled={loading}
-//                         >
-//                             {loading ? 'กำลังบันทึก...' : 'บันทึก'}
-//                         </Button>
-//                     </div>
-//                 </form>
-//             </DialogContent>
-//         </Dialog>
-//     );
-// };
-
-// export default CreateCategoryItemDialog;
-
+export default CreateItemCategoryDialog;
