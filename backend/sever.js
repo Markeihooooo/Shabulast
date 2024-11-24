@@ -7,23 +7,28 @@ const orderRoutes = require('./routes/Order');  // นำเข้า orderRoute
 const CategoryRouter = require('./routes/Category');
 const ItemCategoryRouter = require('./routes/ItemCategory');
 
+
 const path = require('path'); // เพิ่มการ import โมดูล path
+const bodyParser = require('body-parser');
+
 
 
 dotenv.config();
 
 const app = express();
 
+// กำหนดให้ Express สามารถเข้าถึงไฟล์ในโฟลเดอร์ public ได้
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use(express.json({ limit: '10mb' })); // เพิ่มขีดจำกัดการรับ JSON ที่ 10MB
 app.use(express.urlencoded({ limit: '10mb', extended: true })); // เพิ่มขีดจำกัดการรับ URL-encoded form data ที่ 10MB
 
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 
-// ใช้ cors ในทุกคำขอ
-app.use(cors());
+// // ใช้ cors ในทุกคำขอ
+// app.use(cors());
 
 // หรือถ้าคุณต้องการกำหนด CORS เฉพาะ เช่น ให้อนุญาตแค่บางโดเมน
 app.use(cors({
