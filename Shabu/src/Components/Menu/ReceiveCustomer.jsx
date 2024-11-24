@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import { createTable, updateTable } from '../ReceiveCustomer/TableCustomer.js';
-
+import Swal from 'sweetalert2';
 const ReceiveCustomer = () => {
   const [table_number, setTableNumber] = useState('');
   const [customer_count, setCustomerCount] = useState('');
@@ -13,18 +13,16 @@ const ReceiveCustomer = () => {
 
 
 
-
+  const fetchTables = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/tablecustomer/get');
+      const data = await response.json();
+      setTables(data);
+    } catch (error) {
+      console.error('Error fetching table data:', error);
+    }
+  };
   useEffect(() => {
-    const fetchTables = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/tablecustomer/get');
-        const data = await response.json();
-        setTables(data);
-      } catch (error) {
-        console.error('Error fetching table data:', error);
-      }
-    };
-
     fetchTables();
   }, []);
 
@@ -79,14 +77,19 @@ const ReceiveCustomer = () => {
     }
 
     if (result.success) {
-      alert(result.message);
-      const response = await fetch('http://localhost:3001/tablecustomer/get');
-      const data = await response.json();
+      //alert(result.message);
+     
       setTables(data);
     } else {
-      alert(result.message);
+      Swal.fire({
+        title: `สำเร็จ!`,
+        text: `${result.message}`,
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
+      //alert(result.message);
     }
-
+    fetchTables();
     handleGenerateQRCode();
   };
 
@@ -98,8 +101,8 @@ const ReceiveCustomer = () => {
       return;
     }
 
-    const tableNumber = table_number;  
-    const customerCount = customer_count;  
+    const tableNumber = table_number;
+    const customerCount = customer_count;
 
 
 
@@ -199,6 +202,7 @@ const ReceiveCustomer = () => {
         </div>
 
         <div className="mb-4">
+          <label className="block mb-2">ตอนนี้เลือกโต๊ะหมายเลข <span className='font-bold text-red-500'>{table_number}</span></label>
           <label className="block mb-2">จำนวนลูกค้า</label>
           <input
             type="number"
