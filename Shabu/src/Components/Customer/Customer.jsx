@@ -16,24 +16,30 @@ const CustomerPage = () => {
   const [items, setItems] = useState([]);
   const [tablenumber, setTablenumber] = useState(null);
   const [countnumber, setCountnumber] = useState(null);
-  
+
   // For Popup
   const [showPopup, setShowPopup] = useState(false);
 
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(`http://localhost:3001/category/get?page=${currentPage}`);
         const data = await response.json();
-        setCategories(data.data);
-        setTotalPages(data.totalPages);
+        if (data.data) {
+          setCategories(data.data);
+          setTotalPages(data.totalPages);
+        } else {
+          console.error('Invalid category data received');
+        }
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error('Error fetching categories:', error);
       }
     };
     fetchCategories();
   }, [currentPage]);
 
+  // Fetch items based on selected category
   useEffect(() => {
     if (selectedCategoryId) {
       const fetchItems = async () => {
@@ -41,9 +47,13 @@ const CustomerPage = () => {
         try {
           const response = await fetch(`http://localhost:3001/itemCategory/get/${selectedCategoryId}`);
           const data = await response.json();
-          setItems(data);
+          if (Array.isArray(data)) {
+            setItems(data);
+          } else {
+            console.error('Invalid items data received');
+          }
         } catch (error) {
-          console.error("Error fetching items:", error);
+          console.error('Error fetching items:', error);
         } finally {
           setIsLoadingItems(false);
         }
@@ -57,19 +67,53 @@ const CustomerPage = () => {
     setSelectedCategoryName(categoryName);
   };
 
+  // Get table number and count from URL
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const table = searchParams.get('table');
     const count = searchParams.get('count');
+    console.log('หมายเลขโต๊ะ:', table);
+    console.log('จำนวนคน:', count);
     setTablenumber(table);
     setCountnumber(count);
   }, []);
 
-  const addToCart = (item) => {
-    setCart(prevCart => {
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.category_item_id);
+  // Function to send item to cart and backend
+  const addItemToCart = async ( categoryItemId, quantity, orderId) => {
+    if (!orderId) {
+      console.error("Order ID is missing.");
+      return;
+    }
+    try {
+      const response = await fetch('http://localhost:3001/Customer/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category_item_id: categoryItemId,
+          quantity: quantity,
+          order_id: orderId,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Item added to cart:', result.message);
+      } else {
+        console.error('API error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+    }
+  };
+
+  // Add item to cart and immediately call backend to update cart
+  const addToCart = (item) => { 
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.category_item_id);
       if (existingItem) {
-        return prevCart.map(cartItem =>
+        return prevCart.map((cartItem) =>
           cartItem.id === item.category_item_id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
@@ -78,19 +122,80 @@ const CustomerPage = () => {
         return [...prevCart, { ...item, id: item.category_item_id, quantity: 1 }];
       }
     });
+  
     setIsCartOpen(true);
+  
+    // ส่งข้อมูลไปยัง API ทันที
+    addItemToCart(tablenumber, item.category_item_id, 1); // ส่ง `tablenumber`, `category_item_id` และ `quantity`
   };
 
+  // Update cart item quantity
+  const updateItemQuantityInBackend = async (orderId, itemId, quantity) => {
+    try {
+      const response = await fetch('http://localhost:3001/Customer/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          category_item_id: itemId,
+          quantity: quantity,
+        }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Quantity updated:', result.message);
+      } else {
+        console.error('API error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+  };
+
+  // Remove item from cart
+  const removeItemFromBackend = async (orderId, itemId) => {
+    try {
+      const response = await fetch('http://localhost:3001/Customer/remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          category_item_id: itemId,
+        }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Item removed:', result.message);
+      } else {
+        console.error('API error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+    }
+  };
+
+  // Update cart item quantity
   const updateQuantity = (itemId, delta) => {
-    setCart(prevCart => {
+    setCart((prevCart) => {
       const updatedCart = prevCart
-        .map(cartItem =>
+        .map((cartItem) =>
           cartItem.id === itemId
             ? { ...cartItem, quantity: cartItem.quantity + delta }
             : cartItem
         )
-        .filter(cartItem => cartItem.quantity > 0);
-
+        .filter((cartItem) => cartItem.quantity > 0);
+  
+      const updatedItem = updatedCart.find((cartItem) => cartItem.id === itemId);
+      if (updatedItem) {
+        updateItemQuantityInBackend(tablenumber, itemId, updatedItem.quantity);
+      } else if (delta < 0) {
+        removeItemFromBackend(tablenumber, itemId);
+      }
+  
       return updatedCart;
     });
   };
@@ -99,16 +204,19 @@ const CustomerPage = () => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  // Handle checkout
   const handleCheckout = () => {
     setShowPopup(true);  // Show the popup
     setIsCartOpen(false);  // Close the cart
   };
 
+  // Close the popup and clear the cart
   const handleClosePopup = () => {
-    setShowPopup(false);  // Close the popup when the user clicks "ตกลง"
+    setShowPopup(false);  // Close the popup
     setCart([]);  // Clear the cart after the order is placed
   };
 
+  // Switch category pages
   const handleNextCategoryPage = () => {
     setSelectedCategoryId(null);
     setCurrentPage(prevPage => (prevPage < totalPages ? prevPage + 1 : 1));
@@ -234,12 +342,6 @@ const CustomerPage = () => {
                 style={{ width: '80%' }}
               >
                 สั่งอาหาร
-              </button>
-              <button
-                className="call-staff-btn"
-                style={{ width: '80%' }}
-              >
-                เรียกพนักงานเพื่อชำระเงิน
               </button>
             </div>
           </div>

@@ -6,9 +6,9 @@ const LoginRouter = require('./routes/Login');
 const orderRoutes = require('./routes/Order');  // นำเข้า orderRoutes จากไฟล์ Order.js
 const CategoryRouter = require('./routes/Category');
 const ItemCategoryRouter = require('./routes/ItemCategory');
+const CustomerRouter = require('./routes/Customer')
 
 const path = require('path'); // เพิ่มการ import โมดูล path
-
 
 dotenv.config();
 
@@ -17,12 +17,12 @@ const app = express();
 
 app.use(express.json({ limit: '10mb' })); // เพิ่มขีดจำกัดการรับ JSON ที่ 10MB
 app.use(express.urlencoded({ limit: '10mb', extended: true })); // เพิ่มขีดจำกัดการรับ URL-encoded form data ที่ 10MB
+// ใช้ Router สำหรับจัดการเส้นทางที่เกี่ยวข้องกับตะกร้า
 
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// ใช้ cors ในทุกคำขอ
 app.use(cors());
 
 // หรือถ้าคุณต้องการกำหนด CORS เฉพาะ เช่น ให้อนุญาตแค่บางโดเมน
@@ -47,7 +47,7 @@ app.use('/login', LoginRouter);
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
 app.use('/category', CategoryRouter);
 app.use('/itemCategory', ItemCategoryRouter);
-
+app.use('/Customer',CustomerRouter);
 
 // เริ่มเซิร์ฟเวอร์
 app.listen(3001, () => {

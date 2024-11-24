@@ -363,23 +363,6 @@ html, body {
   background-color: #45a049;
 }
 
-/* ปุ่มเรียกพนักงานเพื่อชำระเงิน */
-.call-staff-btn {
-  background-color: #1e9bd9; /* สีฟ้า */
-  color: white;
-  border: none;
-  padding: 12px;
-  width: 100%;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 15px;
-  transition: background-color 0.3s ease;
-}
-
-.call-staff-btn:hover {
-  background-color: #18465e; /* สีฟ้าเข้มเมื่อ hover */
-}
 .cart-item {
   position: relative; /* ทำให้สามารถใช้ position:absolute ได้ภายใน */
   background-color: #f9f9f9;
