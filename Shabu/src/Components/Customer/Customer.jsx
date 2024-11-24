@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Customer.css';
+import './Customer.css'; 
 
 const CustomerPage = () => {
 

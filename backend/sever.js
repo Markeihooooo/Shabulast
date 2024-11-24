@@ -7,10 +7,12 @@ const orderRoutes = require('./routes/Order');  // นำเข้า orderRoute
 const CategoryRouter = require('./routes/Category');
 const ItemCategoryRouter = require('./routes/ItemCategory');
 
-
-const path = require('path'); // เพิ่มการ import โมดูล path
 const bodyParser = require('body-parser');
 
+const TableCustomer = require('./routes/TableCustomer');
+const PaymentRouter = require('./routes/Payment');  // ตรวจสอบว่าใช้เส้นทางที่ถูกต้อง
+const TableCustomerRouter = require('./routes/TableCustomer'); // แก้ไขเส้นทาง router สำหรับ TableCustomer
+const path = require('path');  // เพิ่มการ import โมดูล path
 
 
 dotenv.config();
@@ -19,6 +21,7 @@ const app = express();
 
 // กำหนดให้ Express สามารถเข้าถึงไฟล์ในโฟลเดอร์ public ได้
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
 
 app.use(express.json({ limit: '10mb' })); // เพิ่มขีดจำกัดการรับ JSON ที่ 10MB
 app.use(express.urlencoded({ limit: '10mb', extended: true })); // เพิ่มขีดจำกัดการรับ URL-encoded form data ที่ 10MB
@@ -52,6 +55,12 @@ app.use('/login', LoginRouter);
 app.use('/order-details', orderRoutes);  // เชื่อมโยงเส้นทาง /order-details กับ orderRoutes
 app.use('/category', CategoryRouter);
 app.use('/itemCategory', ItemCategoryRouter);
+app.use('/tableCustomer', TableCustomer);
+
+// เชื่อมต่อ routes
+app.use('/tablecustomer', TableCustomerRouter);
+app.use('/api/payment', PaymentRouter); // ใช้ route สำหรับ Payment
+
 
 
 // เริ่มเซิร์ฟเวอร์

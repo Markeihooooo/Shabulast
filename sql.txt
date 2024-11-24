@@ -31,18 +31,26 @@ CREATE TABLE Category_item (
     update_at TIMESTAMP
 );
 
+-- ตาราง Table (เปลี่ยนชื่อเป็น TableInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
+CREATE TABLE TableInfo (
+    table_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    table_name VARCHAR(50) NOT NULL 
+);
+
 -- ตาราง Order (เปลี่ยนชื่อเป็น OrderInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
 CREATE TABLE OrderInfo (
     order_id SERIAL PRIMARY KEY,
     status VARCHAR(50) NOT NULL,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    table_id UUID REFERENCES TableInfo(table_id) ON DELETE SET NULL  -- เชื่อมโยงกับ TableInfo
 );
 
--- ตาราง Table (เปลี่ยนชื่อเป็น TableInfo เพื่อหลีกเลี่ยงคำสงวนของ PostgreSQL)
-CREATE TABLE TableInfo (
-    table_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id INT REFERENCES OrderInfo(order_id) ON DELETE SET NULL,
-    table_name VARCHAR(50) NOT NULL 
+-- ตาราง Order_item
+CREATE TABLE Order_item (
+    order_item_id SERIAL PRIMARY KEY,
+    category_item_id INT REFERENCES Category_item(category_item_id) ON DELETE CASCADE,
+    quantity INT NOT NULL,
+    order_id INT REFERENCES OrderInfo(order_id) ON DELETE CASCADE
 );
 
 -- ตาราง Bill
@@ -58,57 +66,13 @@ CREATE TABLE Bill (
     checkout TIMESTAMP
 );
 
--- ตาราง Order_item
-CREATE TABLE Order_item (
-    order_item_id SERIAL PRIMARY KEY,
-    category_item_id INT REFERENCES Category_item(category_item_id) ON DELETE CASCADE,
-    quantity INT NOT NULL,
-    order_id INT REFERENCES OrderInfo(order_id) ON DELETE CASCADE
+--ตารางเก็บค่าลูกค้าและ จำนวนคน ของโต๊ะ 
+CREATE TABLE Customer_count (
+    table_number INT PRIMARY KEY NOT NULL,
+    customer_count INT NOT NULL,
+    status_table BOOLEAN DEFAULT FALSE NOT NULL,
+    check_token VARCHAR(50)  NOT NULL
 );
-
-
-
-
-
-
-
-
-
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Employee
-INSERT INTO Employee (username, password, phone_number, role) VALUES 
-('owner', 'ownerpass', '0123456789', 'เจ้าของ'),
-('employee1', 'employeepass1', '0987654321', 'พนักงาน'),
-('cook', 'cookpass', NULL, 'คนทำอาหาร');
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Category
-INSERT INTO Category (category_name, status, create_by, create_at) VALUES
-('Food', TRUE, 1, CURRENT_TIMESTAMP),
-('Drinks', TRUE, 2, CURRENT_TIMESTAMP);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Category_item
-INSERT INTO Category_item (category_item_name, category_item_balance, category_id, create_by, create_at) VALUES
-('Pasta', 20, 1, 1, CURRENT_TIMESTAMP),
-('Coffee', 30, 2, 2, CURRENT_TIMESTAMP);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง TableInfo
-INSERT INTO TableInfo (order_id) VALUES (NULL);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง OrderInfo
-INSERT INTO OrderInfo (status, create_at) VALUES
-('Pending', CURRENT_TIMESTAMP),
-('Completed', CURRENT_TIMESTAMP);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Bill
-INSERT INTO Bill (customer_count, table_id, payment_status, create_at, create_by, checkout) VALUES
-(2, (SELECT table_id FROM TableInfo LIMIT 1), FALSE, CURRENT_TIMESTAMP, 1, NULL);
-
--- สร้างข้อมูลตัวอย่างสำหรับตาราง Order_item
-INSERT INTO Order_item (category_item_id, quantity, order_id) VALUES
-(1, 2, 1),
-(2, 1, 1);
-
-
 
 
 SELECT 
@@ -139,8 +103,8 @@ LEFT JOIN TableInfo ON Bill.table_id = TableInfo.table_id
 -- Join กับตาราง Employee เพื่อนำชื่อของผู้สร้างบิลมาแสดง
 LEFT JOIN Employee ON Bill.create_by = Employee.emp_ID
 
--- Join กับตาราง OrderInfo เพื่อดึง order_id และสถานะคำสั่งซื้อที่เกี่ยวข้องกับบิล
-LEFT JOIN OrderInfo ON TableInfo.order_id = OrderInfo.order_id
+-- Join กับตาราง OrderInfo โดยเชื่อมผ่าน table_id
+LEFT JOIN OrderInfo ON OrderInfo.table_id = TableInfo.table_id
 
 -- Join กับตาราง Order_item เพื่อนำข้อมูลของแต่ละรายการสินค้าในคำสั่งซื้อมาแสดง
 LEFT JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
@@ -149,7 +113,31 @@ LEFT JOIN Order_item ON OrderInfo.order_id = Order_item.order_id
 LEFT JOIN Category_item ON Order_item.category_item_id = Category_item.category_item_id
 
 -- Join กับตาราง Category เพื่อดึงชื่อหมวดหมู่สินค้าที่อยู่ในบิล
-LEFT JOIN Category ON Category_item.category_id = Category.category_id
+LEFT JOIN Category ON Category_item.category_id = Category.category_id  
+
+CREATE OR REPLACE FUNCTION update_table_id()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- หาก table_name ไม่เป็น NULL, ค้นหา table_id จาก TableInfo และอัปเดต
+    IF NEW.table_name IS NOT NULL THEN
+        SELECT table_id INTO NEW.table_id
+        FROM TableInfo
+        WHERE table_name = NEW.table_name;
+        
+        -- หากไม่พบ table_id ให้ส่งข้อผิดพลาด
+        IF NEW.table_id IS NULL THEN
+            RAISE EXCEPTION 'Table with name % does not exist in TableInfo', NEW.table_name;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_set_table_id
+BEFORE INSERT OR UPDATE ON OrderInfo
+FOR EACH ROW
+EXECUTE FUNCTION update_table_id();
 
 -- กำหนดเงื่อนไขการเลือกบิลที่ต้องการ (เปลี่ยนค่า 1 เป็นค่า bill_id ที่ต้องการตรวจสอบ)
 WHERE Bill.bill_id = 1;
