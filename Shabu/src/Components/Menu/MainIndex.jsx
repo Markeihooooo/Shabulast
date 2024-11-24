@@ -69,7 +69,7 @@ import { Checkrole } from './MainindexJs.js';
                             toggleItemsInCategory={toggleItemsInCategory}
                         />
                     )}
-                    {Role === 'พนักงานร้าน' && (
+                    {Role === 'พนักงาน' && (
                         <Menu 
                             toggleReceiveCustomer={toggleReceiveCustomer}  
                             togglePayment={togglePayment}

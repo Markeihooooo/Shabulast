@@ -48,7 +48,7 @@ const Menu = ({ toggleRegister, toggleReceiveCustomer , toggleSetcategor
        
         </>
         )}
-        {Role === 'พนักงานร้าน'&&(
+        {Role === 'พนักงาน'&&(
           <>
           <input type='submit' onClick={toggleReceiveCustomer} value='รับลูกค้า' />
           <input type='submit' onClick={togglePayment} value='ชำระเงินลูกค้า' />
