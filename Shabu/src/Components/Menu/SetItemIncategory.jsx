@@ -19,12 +19,7 @@ const SetItemIncategory = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // ดึงโทเคนจาก localStorage
-  // const token = localStorage.getItem("token");
-
-  // เพิ่มฟังก์ชัน handleItemCreated
-
+  const [isDialogAddOpen, setIsDialogCreateOpen] = useState(false);
 
 
   // Fetch categories with pagination
@@ -65,7 +60,9 @@ const SetItemIncategory = () => {
     setItems([]);  // Clear items when category changes
   };
 
-
+  const openCreateDialog = () => {
+    setIsDialogAddOpen(true);
+  };
   // Open delete dialog
   const openDeleteDialog = (item) => {
     setItemToDelete(item);  // Set item to be deleted
@@ -105,7 +102,7 @@ const SetItemIncategory = () => {
   };
 
   //-----------------------------------------------
-  const handleCloseCreateDialog = () => setIsDialogOpen(false);
+  const handleCloseCreateDialog = () => setIsDialogCreateOpen(false);
 
   const handleCreateSuccess = () => {
     const fetchItems = async () => {
@@ -119,13 +116,13 @@ const SetItemIncategory = () => {
         }
       }
     };
-    
+
     fetchItems();
     handleCloseCreateDialog();
   };
 
   const handleOpenCreateDialog = () => {
-    setIsDialogOpen(true);
+    setIsDialogCreateOpen(true);
   };
   //---------------------------------------------------------
   const handleCloseEditDialog = () => setIsDialogOpen(false);
@@ -140,7 +137,7 @@ const SetItemIncategory = () => {
         } catch (error) {
           console.error("Error fetching items:", error);
         }
-      } 
+      }
     };
     fetchItems();
     handleCloseEditDialog();
@@ -190,13 +187,13 @@ const SetItemIncategory = () => {
             <p className="text-gray-500 text-center">ไม่มีข้อมูลรายการอาหารในหมวดหมู่นี้</p>
           ) : (
             <div className="max-h-[600px] overflow-y-auto">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-4 ">
                 {Array.isArray(items) && items.map((item) => (
                   <div
                     key={item.category_item_id}
-                    className="p-4 bg-white rounded-lg shadow hover:shadow-lg relative"
+                    className="p-4 bg-white rounded-lg shadow hover:shadow-lg relative border-2 border-gray-200"
                   >
-                    <div className="absolute top-2 right-2 flex gap-2">
+                    <div className="absolute top-2 right-2 flex gap-2 ">
                       <button className="text-blue-500 hover:text-blue-600 mr-3 hover:bg-transparent transform hover:scale-125 transition-transform duration-200"
                         onClick={() => openEditDialog(item)}>
                         <Edit size={26} />
@@ -209,12 +206,12 @@ const SetItemIncategory = () => {
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
                       ชื่อรายการ <br />{item.category_item_name}
                     </h3>
-                    <p className="text-gray-600 mb-2">
-                      Balance: {item.category_item_balance}
+                    <p className={`px-3 py-1 rounded-full text-sm ${item.category_item_balance ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      สถานะ : {item.category_item_balance ? 'มีของ' : 'ไม่มีของ'}
                     </p>
                     {item.image_url && (
                       <img
-                        src={item.image_url}  
+                        src={item.image_url}
                         alt={item.category_item_name}
                         className="mt-2 rounded w-full h-40 object-contain"
                       />
@@ -234,17 +231,19 @@ const SetItemIncategory = () => {
               &nbsp; เพิ่มรายการอาหารในหมวดหมู่ : {selectedCategoryName}
             </Button>
 
-            <Button
-              onClick={handleBackToCategories}
-              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-            >
-              เลือกดูหมวดหมู่เพิ่มเติม จากหน้าอื่น
-            </Button>
+            
+              <Button
+                onClick={handleBackToCategories}
+                className="bg-green-400 text-black p-2 rounded hover:bg-green-600 hover:text-white transition-all duration-200"
+              >
+                🍥 เลือกดูหมวดหมู่เพิ่มเติม จากหน้าอื่น
+              </Button>
+            
           </div>
         </div>
       )}
 
-      {!selectedCategoryId && (
+      {!selectedCategoryId  && (
         <div className="flex justify-center mt-4">
           <Button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -274,7 +273,7 @@ const SetItemIncategory = () => {
 
       {/* Dialogs */}
       <CreateCategoryItemDialog
-        isOpen={isDialogOpen}
+        isOpen={isDialogAddOpen}
         onClose={handleCloseCreateDialog}
         onSuccess={handleCreateSuccess}
         categoryId={selectedCategoryId} // ส่ง categoryId ไป
@@ -282,14 +281,15 @@ const SetItemIncategory = () => {
 
 
       {/* Dialogs */}
-      {/* <EditItemCategoryDialog
+      <EditItemCategoryDialog
         isOpen={isDialogOpen}
         onClose={handleCloseEditDialog}
         onSuccess={handleEditSuccess}
         categoryId={selectedCategoryId} // ส่ง categoryId ไป
         category_item_id={itemToDelete?.category_item_id}
-      /> */}
-    
+
+      />
+
     </div>
   );
 };

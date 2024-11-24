@@ -99,7 +99,7 @@ router.get('/get/:category_id', async (req, res) => {
 
 // API สำหรับสร้างข้อมูลในฐานข้อมูล พร้อมอัปโหลดรูปภาพ
 router.post('/create', upload.single('image'), async (req, res) => {
-    const { category_item_name, category_item_balance = 0, category_id } = req.body;
+    const { category_item_name, category_id } = req.body;
 
     const image = req.file; // ไฟล์ที่อัปโหลด
     if (!image) {
@@ -142,8 +142,8 @@ router.post('/create', upload.single('image'), async (req, res) => {
 
         // เพิ่มข้อมูลใหม่ในตาราง Category Item พร้อม emp_ID ใน create_by
         const result = await pool.query(
-            'INSERT INTO public."category_item" (category_id, category_item_name, category_item_balance, image_url, create_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [category_id, category_item_name, category_item_balance, imageUrl, emp_ID]
+            'INSERT INTO public."category_item" (category_id, category_item_name, image_url, create_by) VALUES ($1, $2, $3, $4) RETURNING *',
+            [category_id, category_item_name, imageUrl, emp_ID]
         );
 
         res.status(201).json({ message: 'สร้างไอเท็มหมวดหมู่สำเร็จ', categoryItem: result.rows[0] });
@@ -153,12 +153,10 @@ router.post('/create', upload.single('image'), async (req, res) => {
     }
 });
 
-
 router.patch('/update/:category_item_id', upload.single('image'), async (req, res) => {
-    const { category_item_name, category_item_balance = 0, category_id } = req.body;
-
+    const { category_item_name, category_item_balance, category_id } = req.body;
     const image = req.file; // ไฟล์ที่อัปโหลด
-    const imageUrl = image ? `/public/imgItemCategory/${image.filename}` : null; // Path ของรูปภาพ (ถ้ามี)
+    const imageUrl = image ? `http://localhost:3001/public/imgItemCategory/${image.filename}` : null; // Path ของรูปภาพ (ถ้ามี)
 
     if (!category_id || !category_item_name) {
         return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
@@ -183,13 +181,18 @@ router.patch('/update/:category_item_id', upload.single('image'), async (req, re
         }
 
         const { category_item_id } = req.params; // รับค่า id จาก URL
-        const categoryItem = await pool.query('SELECT * FROM public."category_item" WHERE category_item_id = $1', [category_item_id]);
+
+        // ตรวจสอบว่าหมวดหมู่ไอเท็มมีอยู่จริง
+        const categoryItem = await pool.query(
+            'SELECT * FROM public."category_item" WHERE category_item_id = $1',
+            [category_item_id]
+        );
 
         if (categoryItem.rows.length === 0) {
             return res.status(404).json({ error: 'ไม่พบหมวดหมู่ไอเท็ม' });
         }
 
-        // ตรวจสอบว่า category_item_name นี้มีอยู่ใน category ที่ระบุในฐานข้อมูลหรือไม่
+        // ตรวจสอบว่า category_item_name ซ้ำใน category เดียวกันหรือไม่
         const checkCategoryItem = await pool.query(
             'SELECT * FROM public."category_item" WHERE category_id = $1 AND category_item_name = $2 AND category_item_id != $3',
             [category_id, category_item_name, category_item_id]
@@ -197,6 +200,14 @@ router.patch('/update/:category_item_id', upload.single('image'), async (req, re
 
         if (checkCategoryItem.rows.length > 0) {
             return res.status(400).json({ error: 'หมวดหมู่ไอเท็มนี้มีอยู่แล้ว' });
+        }
+
+        // แปลงค่า category_item_balance ให้เป็น Boolean
+        const categoryItemBalanceBoolean =
+            category_item_balance === 'true' ? true : category_item_balance === 'false' ? false : null;
+
+        if (categoryItemBalanceBoolean === null) {
+            return res.status(400).json({ error: 'category_item_balance ต้องเป็น true หรือ false' });
         }
 
         // อัปเดตข้อมูลในตาราง Category Item
@@ -212,8 +223,8 @@ router.patch('/update/:category_item_id', upload.single('image'), async (req, re
             RETURNING *;
         `;
         const updatedItem = await pool.query(updateQuery, [
-            category_item_name,
-            category_item_balance,
+            category_item_name.trim(),
+            categoryItemBalanceBoolean, // ใช้ค่า Boolean ที่แปลงแล้ว
             imageUrl,
             emp_ID,
             category_item_id
@@ -249,4 +260,39 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
+// API เพื่อดึงข้อมูลจาก categoryId และ category_item_id
+router.get('/get/:categoryId/:categoryItemId', async (req, res) => {
+    const { categoryId, categoryItemId } = req.params;  // ดึงค่าจาก URL params
+
+    try {
+        // SQL Query สำหรับดึงข้อมูลจากตาราง Category_item
+        const query = `
+    SELECT ci.category_item_id, ci.category_item_name, ci.category_item_balance, ci.image_url, ci.category_id,
+            c.category_name, e.username AS created_by, e2.username AS updated_by  -- ใช้ username แทน emp_name
+        FROM Category_item ci
+        LEFT JOIN Category c ON ci.category_id = c.category_id
+        LEFT JOIN Employee e ON ci.create_by = e.emp_ID
+        LEFT JOIN Employee e2 ON ci.update_by = e2.emp_ID
+        WHERE ci.category_id = $1 AND ci.category_item_id = $2
+    `;
+
+
+        // การ execute query และการเชื่อมต่อกับฐานข้อมูล
+        const { rows } = await pool.query(query, [categoryId, categoryItemId]);
+
+        // หากไม่พบข้อมูล
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'ไม่พบข้อมูลรายการอาหารในหมวดหมู่ที่ต้องการ' });
+        }
+
+        // ส่งข้อมูลที่ดึงได้กลับไปที่ client
+        return res.json(rows[0]);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    }
+});
+
 module.exports = router;

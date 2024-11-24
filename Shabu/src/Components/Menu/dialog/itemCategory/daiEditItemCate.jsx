@@ -1,17 +1,17 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle, DialogClose } from "@radix-ui/react-dialog";
 import { Loader2 } from "lucide-react";
 
 const MAX_CATEGORY_LENGTH = 100;
 
-const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess,categoryId, category_item_id }) => {
+const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess, categoryId, category_item_id }) => {
     const [categoryName, setCategoryName] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
-    const [balance, setBalance] = useState(0); // เพิ่ม balance state
+    const [balance, setBalance] = useState(0);
     const [imagePreview, setImagePreview] = useState(null);
 
     const resetForm = useCallback(() => {
@@ -23,6 +23,30 @@ const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess,categoryId, categor
         setBalance(0);
         setImagePreview(null);
     }, []);
+
+    // แก้ไขส่วน useEffect เพื่อแสดงข้อมูลเดิม
+    useEffect(() => {
+        if (categoryId && category_item_id) {
+            setLoading(true);
+            axios.get(`http://localhost:3001/itemCategory/get/${categoryId}/${category_item_id}`)
+                .then(response => {
+                    const categoryItem = response.data;
+
+                    // ตั้งค่าข้อมูลที่ได้จาก API
+                    setCategoryName(categoryItem.category_item_name || '');
+                    setBalance(categoryItem.category_item_balance ? 1 : 0);
+                    if (categoryItem.image_url) {
+                        setImagePreview(categoryItem.image_url);
+                    }
+                })
+                .catch(error => {
+                    setError('ไม่สามารถดึงข้อมูลได้');
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    }, [categoryId, category_item_id]);
 
     const handleClose = useCallback(() => {
         resetForm();
@@ -55,69 +79,67 @@ const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess,categoryId, categor
     };
 
     const handleBalanceChange = (e) => {
-        const value = parseInt(e.target.value, 10) || 0;
-        setBalance(value);
+        setBalance(e.target.checked ? 1 : 0);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         const validationError = validateCategoryName(categoryName);
         if (validationError) {
             setError(validationError);
             return;
         }
-    
-        if (!selectedFile) {
-            setError('กรุณาอัปโหลดไฟล์รูปภาพ');
-            return;
-        }
-    
+
         setError('');
         setSuccess('');
         setLoading(true);
-    
+
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                throw new Error('กรุณาเข้าสู่ระบบอีกครั้ง'); // โยน error หากไม่มี token
+                throw new Error('กรุณาเข้าสู่ระบบอีกครั้ง');
             }
-    
+
             const formData = new FormData();
             formData.append('category_item_name', categoryName.trim());
             formData.append('category_id', categoryId);
-            formData.append('category_item_balance', balance);
-            formData.append('image', selectedFile);
-    
-            const response = await axios.patch('http://localhost:3001/itemCategory/update/{category_item_id}', formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-    
-            // หาก API ส่ง token ใหม่กลับมา ให้อัปเดต localStorage
+            // แก้ไขการส่งค่า balance
+            formData.append('category_item_balance', balance === 1);
+            if (selectedFile) {
+                formData.append('image', selectedFile);
+            }
+
+            const response = await axios.patch(
+                `http://localhost:3001/itemCategory/update/${category_item_id}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
             if (response.data?.token) {
                 localStorage.setItem('token', response.data.token);
             }
-    
-            // ตั้งข้อความสำเร็จ
-            setSuccess('สร้างหมวดหมู่สำเร็จ');
+
+            setSuccess('แก้ไขหมวดหมู่สำเร็จ');
             if (onSuccess) {
                 onSuccess(response.data.category);
             }
-    
-            // ปิด Dialog หลังจากแสดงข้อความสำเร็จ
+
             setTimeout(() => {
                 handleClose();
             }, 1500);
         } catch (err) {
-            // จัดการข้อผิดพลาด
-            const errorMessage = err.response?.data?.error || err.response?.data?.message ||
+            const errorMessage =
+                err.response?.data?.error ||
+                err.response?.data?.message ||
                 (err.response ? 'เกิดข้อผิดพลาดในคำขอ' : 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์');
             setError(errorMessage);
         } finally {
-            // ปิด loading ไม่ว่าผลจะสำเร็จหรือผิดพลาด
             setLoading(false);
         }
     };
@@ -127,7 +149,7 @@ const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess,categoryId, categor
             <DialogOverlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
             <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 shadow-lg z-50 w-[600px]">
                 <DialogTitle className="text-xl font-bold mb-4" aria-labelledby="dialog-title">
-                    เพิ่มรายการอาหารในหมวดหมู่
+                    แก้ไขรายการอาหารในหมวดหมู่
                 </DialogTitle>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -141,31 +163,36 @@ const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess,categoryId, categor
                             onChange={handleCategoryNameChange}
                             className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 
                                 ${error ? 'border-red-500' : 'border-gray-300'}`}
-                            placeholder="กรอกชื่อรายการอาหาร"
+                            placeholder="กรุณากรอกชื่อหมวดหมู่"
                             maxLength={MAX_CATEGORY_LENGTH}
                             required
                             autoFocus
                             disabled={loading}
                         />
+
                         <p className="text-sm text-gray-500">
                             {categoryName.length}/{MAX_CATEGORY_LENGTH} ตัวอักษร
                         </p>
                     </div>
-                    <div style={{ marginBottom: "16px" }}>
-                        <label>จำนวนคงเหลือ : &nbsp;</label>
-                        <input
-                            type="number"
-                            name="category_item_balance"
-                            value={balance} // แสดงค่าปัจจุบันของ balance
-                            onChange={handleBalanceChange} // ใช้ฟังก์ชันจัดการการเปลี่ยนแปลง balance
-                            min="0"
-                            className='border border-gray-300 rounded-md px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-1/4'
-                            required
-                            fullWidth
-                        />
+                    <div>
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                checked={balance === 1}
+                                onChange={handleBalanceChange}
+                                disabled={loading}
+                            />
+                            <span>
+                                รายการอาหาร {categoryName} สินค้า
+                                <span className={balance === 1 ? 'text-green-600' : 'text-red-600'}>
+                                    {balance === 1 ? 'พร้อมจำหน่าย' : 'ไม่พร้อมจำหน่าย'}
+                                </span>
+                            </span>
+                        </label>
+
                     </div>
                     <div>
-                        <label>เลือกรูปภาพ : </label>
+                        <label>เลือกรูปภาพสินค้าใหม่ : </label>
                         <input
                             type="file"
                             name="image"
@@ -173,12 +200,12 @@ const EditItemCategoryDialog = ({ isOpen, onClose, onSuccess,categoryId, categor
                             onChange={handleFileChange}
                             style={{ marginTop: "8px" }}
                         />
-                        {imagePreview && ( // แสดงตัวอย่างรูปภาพถ้ามีการอัปโหลด
-                            <div style={{ marginTop: "16px" }}>
+                        {imagePreview && (
+                            <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <img
                                     src={imagePreview}
                                     alt="Preview"
-                                    style={{ maxWidth: "100%", height: "120px", border: "1px solid #ccc" }}
+                                    className='w-auto h-44 object-cover'
                                 />
                             </div>
                         )}
