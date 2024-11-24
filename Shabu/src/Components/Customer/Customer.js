@@ -1,6 +1,6 @@
 import React from 'react';
 import Customer from './Components/Customer';
-const App = () => {
+const CustomerPage = () => {
   return (
     <div>
       <Customer />
@@ -8,4 +8,4 @@ const App = () => {
   );
 };
     
-export default App;
+export default CustomerPage;
