@@ -5,15 +5,11 @@ import { useNavigate } from 'react-router-dom';
 const OrderPage = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);  // State to store the selected order
-    const [selectedTable, setSelectedTable] = useState(null);   // State to store the selected table
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [selectedTable, setSelectedTable] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchOrderData(); // โหลดคำสั่งซื้อทั้งหมดเมื่อหน้าแรกโหลด
-    }, []);
-    
-    // อัปเดตฟังก์ชัน fetchOrderData หลังจากกรองคำสั่งซื้อแล้ว
+    // โหลดคำสั่งซื้อทั้งหมดหรือกรองตามโต๊ะ
     const fetchOrderData = async (tableName = null) => {
         setLoading(true);
         try {
@@ -23,9 +19,7 @@ const OrderPage = () => {
             }
             const data = await response.json();
     
-            console.log("Fetched order data:", data); // ตรวจสอบข้อมูลที่ได้รับจาก API
-    
-            // การจัดกลุ่มคำสั่งซื้อ
+            // จัดกลุ่มคำสั่งซื้อ
             const groupedOrders = data.reduce((acc, order) => {
                 if (!acc[order.order_id]) {
                     acc[order.order_id] = {
@@ -43,32 +37,24 @@ const OrderPage = () => {
                 return acc;
             }, {});
     
-            let filteredOrders = Object.values(groupedOrders).filter(order => order.order_status !== "Completed" && order.order_status !== "Canceled");
+            let filteredOrders = Object.values(groupedOrders).filter(order => 
+                order.order_status !== "Completed" && order.order_status !== "Canceled"
+            );
     
-            // ถ้ามีการเลือกโต๊ะ ให้กรองคำสั่งซื้อที่ตรงกับ table_name
+            // กรองตามโต๊ะถ้ามีการเลือกโต๊ะ
             if (tableName) {
                 filteredOrders = filteredOrders.filter(order => order.table_name === tableName);
             }
     
-            console.log("Filtered orders:", filteredOrders); // ตรวจสอบคำสั่งซื้อหลังจากกรอง
-    
             setOrders(filteredOrders);
-    
-            // ถ้ามีคำสั่งซื้ออย่างน้อยหนึ่งคำสั่ง ให้เลือกคำสั่งซื้อแรก
-            if (filteredOrders.length > 0) {
-                setSelectedOrder(filteredOrders); // เลือกคำสั่งซื้อทั้งหมดในกรณีนี้
-            } else {
-                setSelectedOrder([]); // ถ้าไม่มีคำสั่งซื้อในโต๊ะที่เลือก ให้เซต selectedOrder เป็นอาเรย์ว่าง
-            }
-    
-            console.log("Selected Order after fetch:", selectedOrder); // ตรวจสอบค่า selectedOrder หลังจากอัปเดต
+            setSelectedOrder(filteredOrders.length > 0 ? filteredOrders[0] : null); // เลือกคำสั่งซื้อแรกหรือ null
         } catch (error) {
             console.error("Error fetching order data:", error);
         }
         setLoading(false);
     };
 
-    // ฟังก์ชันเพื่ออัพเดทสถานะคำสั่งซื้อ
+    // อัปเดตสถานะคำสั่งซื้อ
     const updateOrderStatus = async (order_id) => {
         try {
             const response = await fetch(`http://localhost:3001/order-details/update-order-status/${order_id}`, {
@@ -82,7 +68,7 @@ const OrderPage = () => {
             });
 
             if (response.ok) {
-                fetchOrderData(selectedTable); // Reload data after status change
+                fetchOrderData(selectedTable); // โหลดข้อมูลใหม่
             } else {
                 throw new Error("Failed to update order status");
             }
@@ -91,7 +77,7 @@ const OrderPage = () => {
         }
     };
 
-    // ฟังก์ชันเพื่อยกเลิกคำสั่งซื้อ
+    // ยกเลิกคำสั่งซื้อ
     const cancelOrder = async (order_id) => {
         try {
             const response = await fetch(`http://localhost:3001/order-details/update-order-status/${order_id}`, {
@@ -105,7 +91,7 @@ const OrderPage = () => {
             });
 
             if (response.ok) {
-                fetchOrderData(selectedTable); // Reload data after canceling order
+                fetchOrderData(selectedTable); // โหลดข้อมูลใหม่
             } else {
                 throw new Error("Failed to cancel order");
             }
@@ -114,28 +100,39 @@ const OrderPage = () => {
         }
     };
 
-    // ฟังก์ชันจัดการการคลิกที่คำสั่งซื้อ
+    // เลือกคำสั่งซื้อ
     const handleOrderClick = (order) => {
-        // ถ้าคำสั่งซื้อนั้นถูกเลือกอยู่แล้ว
+        // ถ้าเลือกคำสั่งซื้อแล้ว จะไม่ทำการคลิกซ้ำอีก
         if (selectedOrder && selectedOrder.order_id === order.order_id) {
-            // คลิกซ้ำจะยกเลิกการเลือก
-            setSelectedOrder(null);
+            return; // หยุดการทำงานถ้าคำสั่งซื้อที่เลือกอยู่แล้ว
         } else {
-            // ถ้าไม่, ให้เลือกคำสั่งซื้อนั้น
-            setSelectedOrder(order);
+            setSelectedOrder(order); // เลือกคำสั่งซื้อใหม่
         }
     };
+    
 
-    // ฟังก์ชันจัดการการคลิกที่โต๊ะ
+    // เลือกโต๊ะ
     const handleTableClick = (tableName) => {
-        setSelectedTable(tableName); // Set the selected table
-        console.log(`Fetching orders for table: ${tableName}`);  // Debug: ตรวจสอบว่าเลือกโต๊ะไหน
-        fetchOrderData(tableName); // Fetch orders for the selected table
+        setSelectedTable(tableName);
+        fetchOrderData(tableName);
+    };
+    
+    // ฟังก์ชันตรวจสอบว่าเกิน 10 นาทีหรือยัง
+    const isOrderOlderThan10Minutes = (order_create_at) => {
+        const orderTime = new Date(order_create_at).getTime();
+        const currentTime = Date.now();
+        const timeDifference = currentTime - orderTime;
+    
+        return timeDifference > 10 * 60 * 1000; // 10 นาที = 10 * 60 * 1000 มิลลิวินาที
     };
 
-    // เรียกฟังก์ชันโหลดคำสั่งซื้อทั้งหมดในครั้งแรก
+    // ฟังก์ชันเลือกสีพื้นหลังตามเวลา
+    const getOrderBackgroundColor = (order_create_at) => {
+        return isOrderOlderThan10Minutes(order_create_at) ? 'yellow' : 'white';
+    };
+
     useEffect(() => {
-        fetchOrderData(); // โหลดคำสั่งซื้อทั้งหมดเมื่อหน้าแรกโหลด
+        fetchOrderData();
     }, []);
 
     return (
@@ -156,49 +153,44 @@ const OrderPage = () => {
 
             <div className="order__content">
                 <div className="order__slidebar">
-                    {orders.length === 0 ? ( // ตรวจสอบว่าไม่มีคำสั่งซื้อ
+                    {orders.length === 0 ? (
                         <p>ไม่มีคำสั่งซื้อ</p>
                     ) : (
-                        orders
-                            .filter(order => order.order_status !== 'Completed') // กรองคำสั่งซื้อที่ไม่ใช่ "Completed"
-                            .map((order) => (
-                                <div
-                                    key={order.order_id}
-                                    className="order__item"
-                                    onClick={() => handleOrderClick(order)} // เรียกฟังก์ชันเมื่อคลิก
-                                >
-                                    Order #{order.order_id}
-                                </div>
-                            ))
+                        orders.map((order) => (
+                            <div
+                                key={order.order_id}
+                                className={`order__item ${selectedOrder && selectedOrder.order_id === order.order_id ? 'selected' : ''}`}
+                                onClick={() => handleOrderClick(order)}
+                                style={{ backgroundColor: getOrderBackgroundColor(order.order_create_at) }} // เปลี่ยนสีพื้นหลัง
+                            >
+                                Order #{order.order_id}
+                            </div>
+                        ))
                     )}
                 </div>
 
                 <div className="order__mainbar">
                     {loading ? (
                         <p>กำลังโหลด...</p>
-                    ) : selectedOrder && Array.isArray(selectedOrder) && selectedOrder.length > 0 ? (  // ตรวจสอบว่า selectedOrder เป็นอาเรย์และไม่ว่าง
-                        selectedOrder.map((order) => (
-                            <div className="order__item" key={order.order_id}>
-                                <p><strong>โต๊ะ:</strong> {order.table_name}</p>
-                                <p><strong>รหัสคำสั่งซื้อ:</strong> {order.order_id}</p>
-                                <p><strong>เวลาสั่งซื้อ:</strong> {new Date(order.order_create_at).toLocaleString()}</p>
-                                <p><strong>สถานะ:</strong> {order.order_status}</p>
-                                <p><strong>รายการ:</strong></p>
-                                <ul>
-                                    {order.items.map((item, index) => (
-                                        <li key={index}>{item.category_item_name} ({item.quantity})</li>
-                                    ))}
-                                </ul>
-
-                                {/* ปุ่มเปลี่ยนสถานะ */}
-                                <button onClick={() => updateOrderStatus(order.order_id)} className="update-status-button">
-                                    เปลี่ยนสถานะเป็น Completed
-                                </button>
-                                <button onClick={() => cancelOrder(order.order_id)} className="cancel-order-button">
-                                    ยกเลิกคำสั่งซื้อ
-                                </button>
-                            </div>
-                        ))
+                    ) : selectedOrder ? (
+                        <div className="order__item">
+                            <p><strong>โต๊ะ:</strong> {selectedOrder.table_name}</p>
+                            <p><strong>รหัสคำสั่งซื้อ:</strong> {selectedOrder.order_id}</p>
+                            <p><strong>เวลาสั่งซื้อ:</strong> {new Date(selectedOrder.order_create_at).toLocaleString()}</p>
+                            <p><strong>สถานะ:</strong> {selectedOrder.order_status}</p>
+                            <p><strong>รายการ:</strong></p>
+                            <ul>
+                                {selectedOrder.items.map((item, index) => (
+                                    <li key={index}>{item.category_item_name} ({item.quantity})</li>
+                                ))}
+                            </ul>
+                            <button onClick={() => updateOrderStatus(selectedOrder.order_id)} className="update-status-button">
+                                เปลี่ยนสถานะเป็น Completed
+                            </button>
+                            <button onClick={() => cancelOrder(selectedOrder.order_id)} className="cancel-order-button">
+                                ยกเลิกคำสั่งซื้อ
+                            </button>
+                        </div>
                     ) : (
                         <p>ไม่มีคำสั่งซื้อที่เลือก</p>
                     )}

@@ -34,10 +34,30 @@ const Payment = () => {
   // ฟังก์ชันยืนยันการชำระเงิน
   const handleConfirmPayment = async () => {
     if (!selectedTable) return;
-  
+
     const token = generateToken(selectedTable.table_number, selectedTable.customer_count);
-  
+
     try {
+      // เพิ่มข้อมูลบิลในตาราง `Bill`
+      const billResponse = await fetch('http://localhost:3001/api/bill/add-bill', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: token,
+        }),
+      });
+
+      // อ่าน response body ของ billResponse ครั้งเดียว
+      const billData = await billResponse.json();
+
+      if (!billResponse.ok) {
+        console.error('Error adding bill:', billData);
+        alert('เกิดข้อผิดพลาดในการเพิ่มข้อมูลบิล');
+        return; // หยุดการทำงานถ้าเกิด error
+      }
+
       // ส่งข้อมูลไปที่ API การยืนยันการชำระเงิน
       const paymentResponse = await fetch('http://localhost:3001/api/payment/confirm-payment', {
         method: 'POST',
@@ -50,45 +70,27 @@ const Payment = () => {
           token: token,
         }),
       });
-  
+
       // อ่าน response body ครั้งเดียว
       const paymentData = await paymentResponse.json();
-  
+
       if (!paymentResponse.ok) {
         console.error('Error confirming payment:', paymentData);
         alert(paymentData.message || 'เกิดข้อผิดพลาดในการยืนยันการชำระเงิน');
         return; // หยุดการทำงานถ้าเกิด error
       }
-  
-      // เพิ่มข้อมูลบิลในตาราง `Bill`
-      const billResponse = await fetch('http://localhost:3001/api/bill/add-bill', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: token,
-        }),
-      });
-  
-      // อ่าน response body ของ billResponse ครั้งเดียว
-      const billData = await billResponse.json();
-  
-      if (!billResponse.ok) {
-        console.error('Error adding bill:', billData);
-        alert('เกิดข้อผิดพลาดในการเพิ่มข้อมูลบิล');
-        return; // หยุดการทำงานถ้าเกิด error
-      }
-  
+
+
+
       alert(`ยืนยันการชำระเงินสำเร็จและเพิ่มบิลเรียบร้อย (Bill ID: ${billData.bill_id})`);
-  
+
       // รีเฟรชข้อมูลโต๊ะ
       const refreshResponse = await fetch('http://localhost:3001/tablecustomer/get');
       const refreshedData = await refreshResponse.json();
       setTables(refreshedData);
       setSelectedTable(null);
       setTotalPrice(0);
-  
+
     } catch (error) {
       console.error('Error:', error);
       alert('เกิดข้อผิดพลาดในการยืนยันการชำระเงิน');

@@ -48,8 +48,10 @@ async function seed() {
       INSERT INTO TableInfo (table_id, table_name)  
         VALUES 
           (gen_random_uuid(),'1'),
-          (gen_random_uuid(),'1'),
-          (gen_random_uuid(),'3')
+          (gen_random_uuid(),'2'),
+          (gen_random_uuid(),'3'),
+          (gen_random_uuid(),'4'),
+          (gen_random_uuid(),'5')
     `);
 
 
@@ -57,6 +59,12 @@ async function seed() {
     await pool.query(`
         INSERT INTO OrderInfo (status,  create_at) 
         VALUES 
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
+        ('Pending',  NOW()),
         ('Pending',  NOW()),
         ('Pending',  NOW()),
         ('Pending',  NOW())
@@ -80,7 +88,19 @@ async function seed() {
       (1, 10, 1), --เลขตำแหน่งที่ 1 คือ รายการอาหาร เลขตำแหน่งที่ 2 คือ จํานวน 10 ชิ้น เลขตำแหน่งที่ 3 คือ เลขออเดอร์ที่ 1
       (1, 10, 2),
       (1, 10, 3),
-      (2, 10, 2)
+      (1, 10, 4),
+      (1, 10, 5),
+      (1, 10, 6),
+      (1, 10, 7),
+      (1, 10, 8),
+      (1, 10, 9),
+      (1, 10, 1),
+      (1, 10, 1),
+      (1, 10, 1),
+      (1, 10, 1),
+      (1, 10, 1),
+      (1, 10, 1),
+      (2, 10, 1)
 
     `);
 

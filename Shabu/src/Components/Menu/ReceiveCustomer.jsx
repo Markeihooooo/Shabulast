@@ -162,6 +162,7 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import { createTable, updateTable } from '../ReceiveCustomer/TableCustomer.js';
+import Payment from './Payment';
 
 const ReceiveCustomer = () => {
   const [table_number, setTableNumber] = useState('');
@@ -169,6 +170,7 @@ const ReceiveCustomer = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [error, setError] = useState('');
   const [tables, setTables] = useState([]);
+
 
   useEffect(() => {
     const fetchTables = async () => {
@@ -195,7 +197,7 @@ const ReceiveCustomer = () => {
     setQrCodeUrl(url);
   };
 
-  const generateToken = (table_number, customer_count) => {
+    const generateToken = (table_number, customer_count) => {
     return btoa(`${table_number}-${customer_count}-${Date.now()}`);
   };
 
