@@ -38,9 +38,9 @@ async function seed() {
     await pool.query(`
       INSERT INTO Category_item (category_item_name, category_item_balance, image_url, category_id, create_by) 
       VALUES 
-    ('ชาบูหมู', 10, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQk1kOu9ImvHdtmcZZZjE6S8aNrtoERHDvKQ&s', 1, 1),
-    ('น้ำเปล่า', 50, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbVy5dGMi0H83xBFe7xYftBvcvEVslLTy0bQ&s', 2, 1),
-    ('ไอศกรีม', 20, 'https://www.hfocus.org/sites/default/files/u11/shutterstock_13847400822.jpg', 3, 1)
+    ('ชาบูหมู', true, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQk1kOu9ImvHdtmcZZZjE6S8aNrtoERHDvKQ&s', 1, 1),
+    ('น้ำเปล่า', true, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbVy5dGMi0H83xBFe7xYftBvcvEVslLTy0bQ&s', 2, 1),
+    ('ไอศกรีม', true, 'https://www.hfocus.org/sites/default/files/u11/shutterstock_13847400822.jpg', 3, 1)
     `);
 
     // เพิ่มข้อมูลใน TableInfo

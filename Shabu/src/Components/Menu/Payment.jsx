@@ -33,12 +33,15 @@ const Payment = () => {
 
   // ฟังก์ชันยืนยันการชำระเงิน
   const handleConfirmPayment = async () => {
+    
+
     if (!selectedTable) return;
 
     const token = generateToken(selectedTable.table_number, selectedTable.customer_count);
 
     try {
       // เพิ่มข้อมูลบิลในตาราง `Bill`
+
       const billResponse = await fetch('http://localhost:3001/api/bill/add-bill', {
         method: 'POST',
         headers: {
@@ -55,6 +58,7 @@ const Payment = () => {
       if (!billResponse.ok) {
         console.error('Error adding bill:', billData);
         alert('เกิดข้อผิดพลาดในการเพิ่มข้อมูลบิล');
+
         return; // หยุดการทำงานถ้าเกิด error
       }
 

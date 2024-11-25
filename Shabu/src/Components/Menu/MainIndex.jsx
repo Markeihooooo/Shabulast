@@ -69,7 +69,7 @@ import { Checkrole } from './MainindexJs.js';
                             toggleItemsInCategory={toggleItemsInCategory}
                         />
                     )}
-                    {Role === 'พนักงานร้าน' && (
+                    {Role === 'พนักงาน' && (
                         <Menu 
                             toggleReceiveCustomer={toggleReceiveCustomer}  
                             togglePayment={togglePayment}
@@ -87,7 +87,7 @@ import { Checkrole } from './MainindexJs.js';
                 </div>
         
 
-        <div className='content'>
+        <div className='content w-60'>
           
          {activeComponent === 'register' && <Register />}
          {activeComponent === 'receiveCustomer' && <ReceiveCs />}
