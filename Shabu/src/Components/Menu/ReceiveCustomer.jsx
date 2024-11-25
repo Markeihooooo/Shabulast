@@ -162,7 +162,12 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import { createTable, updateTable } from '../ReceiveCustomer/TableCustomer.js';
+
 import Payment from './Payment';
+
+
+import Swal from 'sweetalert2';
+
 
 const ReceiveCustomer = () => {
   const [table_number, setTableNumber] = useState('');
