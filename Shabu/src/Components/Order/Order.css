@@ -1,153 +1,191 @@
-/* สไตล์สำหรับ container หลัก */
+/* Container หลัก */
 .order__main-container {
     display: flex;
-    height: 100vh;
+    height: 95vh;
+    width: 95vw;
+    margin: auto;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 /* Sidebar */
 .order__sidebar {
     flex: 1;
-    background-color: #f0f0f0;
+    background-color: #f7f7f7;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-shadow: inset -1px 0 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Icon container ใน sidebar */
+/* Icon container */
 .order__icon-container {
-    margin: 20px 0;
+    margin: 20px;
 }
 
 .order__icon {
-    width: 80%;
     border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Table list ใน sidebar */
-.order__table-list {
-    list-style-type: none;
-    padding: 0;
+/* Table Buttons */
+.order__table-buttons {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    gap: 15px;
 }
 
-/* Table item ใน sidebar */
-.order__table-item {
+.order__table-buttons button {
+    padding: 12px;
+    font-size: 16px;
     cursor: pointer;
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #fff;
-    border-radius: 5px;
-    text-align: center;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 8px;
+    color: #333;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* สไตล์เมื่อมีการเลือก table */
-.order__table-item.active {
-    background-color: #ddd;
+.order__table-buttons button:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.03);
 }
 
-/* Content area */
+.order__table-buttons button.selected {
+    background-color: #4caf50;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Content Area */
 .order__content {
     flex: 3;
     padding: 20px;
-    background-color: #ffffff;
+    background-color: #fff;
     display: flex;
     flex-direction: column;
+    gap: 20px;
 }
 
-/* Slidebar ใน content */
+/* Slidebar */
 .order__slidebar {
-    background-color: red;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: #5e2318; /* สีพื้นหลัง */
+    padding: 15px;
+    color: white; /* สีข้อความ */
+    border-radius: 8px; /* มุมโค้ง */
     text-align: center;
-    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+    font-size: 18px; /* ขนาดตัวอักษร */
+    font-weight: bold; /* ตัวอักษรหนา */
+    display: flex; /* ใช้ flexbox */
+    flex-direction: row; /* จัดเรียงในแนวนอน */
+    gap: 15px; /* ระยะห่างระหว่างแต่ละไอเท็ม */
+    justify-content: flex-start; /* จัดชิดซ้าย */
+    overflow-x: auto; /* เพิ่มการเลื่อนแนวนอนเมื่อพื้นที่ไม่พอ */
+    white-space: nowrap; /* ป้องกันการห่อของเนื้อหา */
+    align-items: center; /* จัดให้อยู่กลางในแนวตั้ง */
 }
 
-/* Mainbar สำหรับรายการคำสั่งซื้อ */
+/* Mainbar */
 .order__mainbar {
-    background-color: lightgray;
+    background-color: #f8f9fa;
     padding: 20px;
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
+    gap: 15px;
     justify-content: center;
-    align-items: flex-start;
 }
-
-/* รายการคำสั่งซื้อ */
+.order__all-items{
+    background-color: #fff; /* สีพื้นหลัง */
+    padding: 20px; /* เพิ่มระยะขอบภายใน */
+    border-radius: 10px; /* มุมโค้งมน */
+    display: flex; /* เปิดใช้งาน flexbox */
+    flex-direction: column; /* จัดเรียงเนื้อหาในแนวตั้ง */
+    align-items: center; /* จัดตรงกลางแนวแกนหลัก */
+    justify-content: center; /* จัดตรงกลางแนวแกนรอง */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+    transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out; /* เพิ่มเอฟเฟกต์ */
+    width: calc(30% - 10px); /* ขนาดแบบยืดหยุ่น 3 ชิ้นต่อแถว */
+    margin: 10px; /* เพิ่มช่องว่างระหว่างแต่ละชิ้น */
+    text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+}
+/* Items */
 .order__item {
-    border: 1px solid #ccc;
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #fff; /* สีพื้นหลัง */
+    padding: 20px; /* เพิ่มระยะขอบภายใน */
+    border-radius: 10px; /* มุมโค้งมน */
+    display: flex; /* เปิดใช้งาน flexbox */
+    flex-direction: column; /* จัดเรียงเนื้อหาในแนวตั้ง */
+    align-items: center; /* จัดตรงกลางแนวแกนหลัก */
+    justify-content: center; /* จัดตรงกลางแนวแกนรอง */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+    transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out; /* เพิ่มเอฟเฟกต์ */
+    width: calc(30% - 10px); /* ขนาดแบบยืดหยุ่น 3 ชิ้นต่อแถว */
+    margin: 10px; /* เพิ่มช่องว่างระหว่างแต่ละชิ้น */
+    text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
 }
 
-/* Hover effect สำหรับ item */
 .order__item:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
+    transform: scale(1.05); /* ขยายเล็กน้อย */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* เพิ่มเงา */
 }
 
-/* สไตล์ของปุ่มทั่วไป */
+.order__item.selected {
+    background-color: #4caf50;
+    color: rgb(0, 0, 0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ปุ่มทั่วไป */
 button {
     padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
     font-size: 16px;
     cursor: pointer;
-    margin: 10px 0;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Hover effect สำหรับปุ่ม */
 button:hover {
-    background-color: blue;
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Active effect เมื่อคลิกปุ่ม */
 button:active {
-    background-color: darkblue;
+    background-color: #003d7a;
 }
 
-/* Disabled state สำหรับปุ่ม */
 button:disabled {
     background-color: #bdbdbd;
     cursor: not-allowed;
 }
 
-/* สไตล์เฉพาะสำหรับปุ่ม "เปลี่ยนสถานะ" */
+/* ปุ่มเปลี่ยนสถานะ */
 .update-status-button {
-    background-color: #4CAF50; /* สีพื้นหลังเขียว */
-    color: white; /* สีตัวอักษร */
-    border: none; /* ไม่มีขอบ */
-    padding: 10px 20px; /* การเว้นระยะภายในปุ่ม */
-    font-size: 16px; /* ขนาดตัวอักษร */
-    cursor: pointer; /* เปลี่ยนเคอร์เซอร์เป็นมือเมื่อชี้ไปที่ปุ่ม */
-    border-radius: 5px; /* มุมปุ่มโค้ง */
-    transition: background-color 0.3s ease; /* การเปลี่ยนสีพื้นหลังเมื่อมีการโต้ตอบ */
-    width: auto; /* ความกว้างของปุ่มตามขนาดของเนื้อหา */
-    margin-top: 10px; /* ระยะห่างด้านบน */
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
-/* เปลี่ยนสีพื้นหลังเมื่อชี้ไปที่ปุ่ม */
 .update-status-button:hover {
-    background-color: #45a049; /* สีพื้นหลังเข้มขึ้นเมื่อชี้ */
+    background-color: #218838;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* เปลี่ยนสีพื้นหลังเมื่อคลิกปุ่ม */
 .update-status-button:active {
-    background-color: #388e3c; /* สีพื้นหลังเข้มขึ้นเมื่อคลิก */
-}
-
-/* สไตล์เมื่อปุ่มถูกปิดการใช้งาน */
-.update-status-button:disabled {
-    background-color: #bdbdbd; /* สีพื้นหลังเมื่อปุ่มถูกปิดการใช้งาน */
-    cursor: not-allowed; /* เปลี่ยนเคอร์เซอร์เป็นปกติเมื่อปิดการใช้งาน */
+    background-color: #1e7e34;
 }

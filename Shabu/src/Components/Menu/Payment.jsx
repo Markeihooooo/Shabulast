@@ -41,7 +41,7 @@ const Payment = () => {
 
     try {
       // เพิ่มข้อมูลบิลในตาราง `Bill`
-      
+
       const billResponse = await fetch('http://localhost:3001/api/bill/add-bill', {
         method: 'POST',
         headers: {
@@ -51,15 +51,14 @@ const Payment = () => {
           token: token,
         }),
       });
-      
+
       // อ่าน response body ของ billResponse ครั้งเดียว
       const billData = await billResponse.json();
 
       if (!billResponse.ok) {
         console.error('Error adding bill:', billData);
         alert('เกิดข้อผิดพลาดในการเพิ่มข้อมูลบิล');
-        
-        
+
         return; // หยุดการทำงานถ้าเกิด error
       }
 
