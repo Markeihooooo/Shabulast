@@ -32,7 +32,7 @@ router.post('/confirm-payment', async (req, res) => {
 
 // ฟังก์ชันเพิ่มข้อมูลในตาราง Bill
 router.post('/add-bill', async (req, res) => {
-    const { token, create_by } = req.body;
+    const { token } = req.body;
 
     if (!token) {
         return res.status(400).json({ success: false, message: 'Token is required' });
@@ -59,12 +59,12 @@ router.post('/add-bill', async (req, res) => {
 
         // เพิ่มข้อมูลใน Bill พร้อมทั้งเพิ่มเวลาการสร้างบิล (create_at)
         const insertQuery = `
-            INSERT INTO Bill (customer_count, table_id, create_by, create_at)
-            VALUES ($1, $2, $3, NOW())  -- ใช้ NOW() เพื่อบันทึกเวลาปัจจุบัน
+            INSERT INTO Bill (customer_count, table_id, create_at)
+            VALUES ($1, $2, NOW())  -- ใช้ NOW() เพื่อบันทึกเวลาปัจจุบัน
             RETURNING bill_id
         `;
 
-        const insertResult = await db.query(insertQuery, [customer_count, table_id, create_by]);
+        const insertResult = await db.query(insertQuery, [customer_count, table_id]);
 
         const bill_id = insertResult.rows[0].bill_id;
 
@@ -73,16 +73,14 @@ router.post('/add-bill', async (req, res) => {
             UPDATE Bill
             SET payment_status = $1,
                 checkout = $2,
-                update_by = $3,
                 update_at = NOW()  -- ใช้ NOW() เพื่อบันทึกเวลาปัจจุบันในการอัปเดต
-            WHERE bill_id = $4
+            WHERE bill_id = $3
             RETURNING *
         `;
         
         const updateResult = await db.query(updateQuery, [
             true,                // payment_status
             new Date(),          // checkout
-            create_by,           // update_by (ใช้ employee_id ที่ส่งมา)
             bill_id,             // bill_id ที่จะอัปเดต
         ]);
 
