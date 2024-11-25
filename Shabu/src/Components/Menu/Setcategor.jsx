@@ -86,8 +86,8 @@ const Setcategor = () => {
   return (
     <div className="p-4 rounded-lg">
       {/* Header */}
-      <Section className="mb-6 p-6 bg-gradient-to-r from-rose-100 to-red-100 rounded-xl shadow-sm">
-        <Text className="text-red-900 text-center font-bold text-3xl">
+      <Section className="mb-6 p-6 bg-gradient-to-r from-rose-100 to-red-100 rounded-xl shadow-sm justify-center text-center items-center">
+        <Text className="text-red-900 text-center font-bold text-3xl justify-center">
           หมวดหมู่อาหาร
         </Text>
       </Section>
