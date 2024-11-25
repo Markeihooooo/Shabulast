@@ -297,7 +297,7 @@ const History = () => {
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <div className="max-h-[400px] overflow-y-auto">
           <Table.Root className="w-full text-center border border-gray-300">
-            <Table.Header className="sticky top-0 bg-[#00337e] border-b border-gray-300">
+            <Table.Header className="sticky top-0 bg-[#00337e] border-b border-gray-300 h-10 items-center">
               <Table.Row>
                 <Table.ColumnHeaderCell style={{ color: '#ffffff', width: '10%' }} className="text-center border border-gray-300">
                   ลําดับ

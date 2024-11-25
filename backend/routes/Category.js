@@ -87,38 +87,29 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-// กำหนดเส้นทาง (route) สำหรับรับคำขอ HTTP แบบ PATCH ที่ endpoint '/update/:id'
-// โดย :id เป็นตัวแปรที่รับค่า id ของหมวดหมู่ที่ต้องการอัปเดต
 router.patch('/update/:id', async (req, res) => {
-    const { category_name, is_active } = req.body; // รับค่า category_name จาก body
+    const { category_name, is_active } = req.body;
 
-    // ตรวจสอบว่า category_name ถูกส่งมาหรือไม่
     if (!category_name) {
         return res.status(400).json({ error: 'กรุณากรอกชื่อหมวดหมู่' });
     }
 
     try {
-        // รับค่า token จาก header Authorization
         const token = req.header('Authorization')?.replace('Bearer ', '');
-
         if (!token) {
             return res.status(401).json({ error: 'Token is missing or invalid' });
         }
 
-        // Decode token
         const decoded = jwt.verify(token, secret);
-        console.log('Decoded token:', decoded);
-
-        // ดึง emp_ID จาก decoded token
         const { emp_ID } = decoded;
+
         if (!emp_ID) {
             return res.status(400).json({ error: 'Invalid token - No emp_ID found' });
         }
 
-        const { id } = req.params; // รับค่า id จาก URL
+        const { id } = req.params;
 
-        // ตรวจสอบว่า category_id นี้มีอยู่ในฐานข้อมูลหรือไม่
+        // ตรวจสอบว่าหมวดหมู่มีอยู่ในฐานข้อมูลหรือไม่
         const checkCategory = await pool.query(
             'SELECT * FROM public."category" WHERE category_id = $1',
             [id]
@@ -128,10 +119,19 @@ router.patch('/update/:id', async (req, res) => {
             return res.status(404).json({ error: 'หมวดหมู่นี้ไม่พบในฐานข้อมูล' });
         }
 
-        // แปลง is_active เป็น boolean ถ้าเป็น string
-        const activeStatus = is_active === "true" ? true : is_active === "false" ? false : is_active;
+        // ตรวจสอบว่าชื่อหมวดหมู่ซ้ำหรือไม่
+        const checkCategoryName = await pool.query(
+            'SELECT * FROM public."category" WHERE category_name = $1 AND category_id != $2',
+            [category_name, id]
+        );
 
-        // อัปเดตข้อมูลหมวดหมู่ พร้อมกับค่า status
+        if (checkCategoryName.rows.length > 0) {
+            return res.status(400).json({ error: 'ชื่อหมวดหมู่นี้ซ้ำ' });
+        }
+
+        const activeStatus =
+            is_active === "true" ? true : is_active === "false" ? false : is_active;
+
         const result = await pool.query(
             'UPDATE public."category" SET category_name = $1, update_by = $2, update_at = CURRENT_TIMESTAMP, is_active = $3 WHERE category_id = $4 RETURNING *',
             [category_name, emp_ID, activeStatus, id]
@@ -144,6 +144,7 @@ router.patch('/update/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 // กำหนดเส้นทาง (route) สำหรับรับคำขอ HTTP แบบ DELETE ที่ endpoint '/delete/:id'
 // โดย :id เป็นตัวแปรที่รับค่า id ของหมวดหมู่ที่ต้องการลบ

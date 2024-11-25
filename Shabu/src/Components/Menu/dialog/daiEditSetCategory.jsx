@@ -50,7 +50,7 @@ const EditCategoryDialog = ({ open, onClose, category, onCategoryUpdated }) => {
             onCategoryUpdated(response.data.category);
             //setTimeout(handleClose, 1500);
         } catch (error) {
-            setError('เกิดข้อผิดพลาดในการอัปเดตข้อมูล');
+            setError('ชื่อหมวดหมู่นี้มีอยู่แล้ว');
         } finally {
             setLoading(false);
         }

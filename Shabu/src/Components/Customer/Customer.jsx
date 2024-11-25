@@ -41,30 +41,41 @@ const CustomerPage = () => {
 
   // Fetch items based on selected category
   useEffect(() => {
-    if (selectedCategoryId) {
-      const fetchItems = async () => {
-        setIsLoadingItems(true);
-        try {
-          const response = await fetch(`http://localhost:3001/itemCategory/get/${selectedCategoryId}`);
-          const data = await response.json();
-          if (Array.isArray(data)) {
-            setItems(data);
-          } else {
-            console.error('Invalid items data received');
-          }
-        } catch (error) {
-          console.error('Error fetching items:', error);
-        } finally {
-          setIsLoadingItems(false);
-        }
-      };
-      fetchItems();
+    if (!selectedCategoryId) {
+      setItems([]); // หากไม่มีหมวดหมู่ที่เลือก รีเซ็ตรายการสินค้า
+      return;
     }
+  
+    const fetchItems = async () => {
+      setIsLoadingItems(true);
+      setItems([]); // รีเซ็ตรายการสินค้าเพื่อแสดงสถานะที่ถูกต้องระหว่างการโหลด
+      try {
+        const response = await fetch(`http://localhost:3001/itemCategory/get/${selectedCategoryId}`);
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          // กรองเฉพาะรายการที่มี category_item_balance เป็น true
+          const filteredItems = data.filter(item => item.category_item_balance === true);
+          setItems(filteredItems);
+        } else {
+          console.error('Invalid items data received');
+          setItems([]); // หากไม่มีข้อมูล ให้ตั้งค่าเป็นอาร์เรย์ว่าง
+        }
+      } catch (error) {
+        console.error('Error fetching items:', error);
+        setItems([]); // หากเกิดข้อผิดพลาด ให้ตั้งค่าเป็นอาร์เรย์ว่าง
+      } finally {
+        setIsLoadingItems(false);
+      }
+    };
+  
+    fetchItems();
   }, [selectedCategoryId]);
+  
 
   const handleCategoryClick = (categoryId, categoryName) => {
     setSelectedCategoryId(categoryId);
     setSelectedCategoryName(categoryName);
+    setItems([]);
   };
 
   // Get table number and count from URL
@@ -77,15 +88,47 @@ const CustomerPage = () => {
     setTablenumber(table);
     setCountnumber(count);
   }, []);
-
-  // Function to send item to cart and backend
-  const addItemToCart = async ( categoryItemId, quantity, orderId) => {
-    if (!orderId) {
-      console.error("Order ID is missing.");
-      return;
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategoryId) {
+      const firstCategory = categories[0];
+      setSelectedCategoryId(firstCategory.category_id);
+      setSelectedCategoryName(firstCategory.category_name);
     }
+  }, [categories]);
+  
+//ของคิว
+  // Function to send item to cart and backend
+  // const addItemToCart = async ( categoryItemId, quantity, orderId) => {
+  //   if (!orderId) {
+  //     console.error("Order ID is missing.");
+  //     return;
+  //   }
+  //   try {
+  //     const response = await fetch('http://localhost:3001/Customer/add', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         category_item_id: categoryItemId,
+  //         quantity: quantity,
+  //         order_id: orderId,
+  //       }),
+  //     });
+
+  //     const result = await response.json();
+  //     if (response.ok) {
+  //       console.log('Item added to cart:', result.message);
+  //     } else {
+  //       console.error('API error:', result.message);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error adding item to cart:', error);
+  //   }
+  // };
+  const addItemToCart = async (categoryItemId, quantity, tableId) => {
     try {
-      const response = await fetch('http://localhost:3001/Customer/add', {
+      const response = await fetch('http://localhost:3001/Customer/createOrderWithItems', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,20 +136,22 @@ const CustomerPage = () => {
         body: JSON.stringify({
           category_item_id: categoryItemId,
           quantity: quantity,
-          order_id: orderId,
+          table_id: tableId,
         }),
       });
-
+  
       const result = await response.json();
       if (response.ok) {
-        console.log('Item added to cart:', result.message);
+        console.log('เพิ่มสินค้าในตะกร้าสำเร็จ:', result.message);
       } else {
         console.error('API error:', result.message);
       }
     } catch (error) {
-      console.error('Error adding item to cart:', error);
+      console.error('เกิดข้อผิดพลาดในการเพิ่มสินค้า:', error);
     }
   };
+  
+
 
   // Add item to cart and immediately call backend to update cart
   const addToCart = (item) => { 
@@ -203,11 +248,45 @@ const CustomerPage = () => {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
-
+//ของคิว
   // Handle checkout
-  const handleCheckout = () => {
-    setShowPopup(true);  // Show the popup
-    setIsCartOpen(false);  // Close the cart
+  // const handleCheckout = () => {
+  //   setShowPopup(true);  // Show the popup
+  //   setIsCartOpen(false);  // Close the cart
+  // };
+
+  const handleCheckout = async () => {
+    const tableId = '1f375e5b-118d-490e-915b-84d06287f129'; // ID ของโต๊ะที่เกี่ยวข้อง//-----------------------------------------------------
+    const orderStatus = 'Pending'; // สถานะเริ่มต้น
+    const cartItems = cart.map((item) => ({
+      category_item_id: item.id,
+      quantity: item.quantity,
+    }));
+  
+    try {
+      const response = await fetch('http://localhost:3001/Customer/createOrderWithItems', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          table_id: tableId,
+          status: orderStatus,
+          items: cartItems,
+        }),
+      });
+  
+      const result = await response.json();
+      if (response.ok) {
+        console.log('ออร์เดอร์ถูกสร้างสำเร็จ:', result.order_id);
+        setCart([]); // ล้างตะกร้าหลังจากทำการสั่งสำเร็จ
+        setShowPopup(true);
+      } else {
+        console.error('API error:', result.message);
+      }
+    } catch (error) {
+      console.error('เกิดข้อผิดพลาดในการสั่งสินค้า:', error);
+    }
   };
 
   // Close the popup and clear the cart
@@ -274,7 +353,7 @@ const CustomerPage = () => {
           ) : Array.isArray(items) && items.length === 0 ? (
             <div className="flex flex-col justify-center items-center h-[500px]">
               <p>หมวดหมู่ {selectedCategoryName} ยังไม่มีรายการอาหาร</p>
-              <p className="text-gray-500 text-center">บอกว่าไม่มีรายการไปสั่งอย่างอื่น!!!!</p>
+              <p className="text-gray-500 text-center">กรุณาเลือกหมวดหมู่อื่น</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-4">

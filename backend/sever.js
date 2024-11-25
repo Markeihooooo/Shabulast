@@ -89,8 +89,6 @@ const CategoryRouter = require('./routes/Category');
 const ItemCategoryRouter = require('./routes/ItemCategory');
 const CustomerRouter = require('./routes/Customer')
 
-const bodyParser = require('body-parser');
-
 
 const TableCustomer = require('./routes/TableCustomer');
 const PaymentRouter = require('./routes/Payment');

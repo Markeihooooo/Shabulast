@@ -55,14 +55,24 @@ const SetItemIncategory = () => {
 
   // Handle category selection
   const handleCategoryClick = (categoryId, categoryName) => {
-    setSelectedCategoryId(categoryId);
-    setSelectedCategoryName(categoryName);
-    setItems([]);  // Clear items when category changes
+    if (selectedCategoryId === categoryId) {
+      // รีเซ็ต state ถ้าหมวดหมู่เดิมถูกกด
+      setSelectedCategoryId(null);
+      setItems([]);
+      setTimeout(() => {
+        // ตั้งค่าใหม่หลังรีเซ็ตเพื่อบังคับ re-render
+        setSelectedCategoryId(categoryId);
+        setSelectedCategoryName(categoryName);
+      }, 0); // ใช้ timeout เพื่อให้ React ทันจับการเปลี่ยนแปลง
+    } else {
+      // หากหมวดหมู่ใหม่ถูกกด
+      setSelectedCategoryId(categoryId);
+      setSelectedCategoryName(categoryName);
+      setItems([]); // Clear items
+    }
   };
+  
 
-  const openCreateDialog = () => {
-    setIsDialogAddOpen(true);
-  };
   // Open delete dialog
   const openDeleteDialog = (item) => {
     setItemToDelete(item);  // Set item to be deleted
@@ -71,10 +81,13 @@ const SetItemIncategory = () => {
 
   //open edit dialog
   const openEditDialog = (item) => {
-    setItemToDelete(item);  // Set item to be deleted
-    setIsDialogOpen(true);  // Open the dialog
+    setItemToDelete(null); // รีเซ็ตค่าเดิมก่อน
+    setTimeout(() => {
+      setItemToDelete(item); // ตั้งค่ารายการใหม่
+      setIsDialogOpen(true); // เปิด dialog
+    }, 0); // ใช้ timeout เพื่อให้ state เปลี่ยนแปลงทันที
   };
-
+  
   // Close delete dialog
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);  // Close the dialog
@@ -145,7 +158,7 @@ const SetItemIncategory = () => {
 
   return (
     <div className="p-6 ">
-      <Section className="mb-6 p-6 bg-gradient-to-r from-rose-100 to-red-100 rounded-xl shadow-sm">
+      <Section className="mb-6 p-6 bg-gradient-to-r from-rose-100 to-red-100 rounded-xl shadow-sm justify-center text-center items-center">
         <Text className="text-red-900 text-center font-bold text-3xl">
           รายการอาหาร
         </Text>
