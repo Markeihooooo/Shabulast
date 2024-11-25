@@ -1,4 +1,5 @@
-
+ 
+ 
 
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
@@ -18,15 +19,8 @@ const ReceiveCustomer = () => {
 
 
   useEffect(() => {
-    const fetchTables = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/tablecustomer/get');
-        const data = await response.json();
-        setTables(data);
-      } catch (error) {
-        console.error('Error fetching table data:', error);
-      }
-    };
+    fetchTables();
+  }, []);
 
 
 
