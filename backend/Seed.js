@@ -75,10 +75,10 @@ async function seed() {
 
     // เพิ่มข้อมูลใน Bill
     await pool.query(`
-      INSERT INTO Bill (customer_count, table_id, payment_status, create_by) 
+      INSERT INTO Bill (customer_count, table_id, payment_status) 
       VALUES 
-      (4, (SELECT table_id FROM TableInfo LIMIT 1), FALSE, 1),
-      (2, (SELECT table_id FROM TableInfo OFFSET 1 LIMIT 1), FALSE, 1)
+      (4, (SELECT table_id FROM TableInfo LIMIT 1), FALSE),
+      (2, (SELECT table_id FROM TableInfo OFFSET 1 LIMIT 1), FALSE)
     `);
 
     // สร้างข้อมูลตัวอย่างสำหรับตาราง Order_item
