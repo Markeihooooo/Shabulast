@@ -16,7 +16,8 @@ const CustomerPage = () => {
   const [items, setItems] = useState([]);
   const [tablenumber, setTablenumber] = useState(null);
   const [countnumber, setCountnumber] = useState(null);
-
+  const [uuid, setUuid] = useState('');
+  const [token, setToken] = useState(null);
   // For Popup
   const [showPopup, setShowPopup] = useState(false);
 
@@ -83,10 +84,13 @@ const CustomerPage = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const table = searchParams.get('table');
     const count = searchParams.get('count');
+    const token = searchParams.get('token');
     console.log('หมายเลขโต๊ะ:', table);
     console.log('จำนวนคน:', count);
+    console.log('Token:', token);
     setTablenumber(table);
     setCountnumber(count);
+    setToken(token);
   }, []);
   useEffect(() => {
     if (categories.length > 0 && !selectedCategoryId) {
@@ -96,36 +100,7 @@ const CustomerPage = () => {
     }
   }, [categories]);
   
-//ของคิว
-  // Function to send item to cart and backend
-  // const addItemToCart = async ( categoryItemId, quantity, orderId) => {
-  //   if (!orderId) {
-  //     console.error("Order ID is missing.");
-  //     return;
-  //   }
-  //   try {
-  //     const response = await fetch('http://localhost:3001/Customer/add', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         category_item_id: categoryItemId,
-  //         quantity: quantity,
-  //         order_id: orderId,
-  //       }),
-  //     });
 
-  //     const result = await response.json();
-  //     if (response.ok) {
-  //       console.log('Item added to cart:', result.message);
-  //     } else {
-  //       console.error('API error:', result.message);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error adding item to cart:', error);
-  //   }
-  // };
   const addItemToCart = async (categoryItemId, quantity, tableId) => {
     try {
       const response = await fetch('http://localhost:3001/Customer/createOrderWithItems', {
@@ -199,6 +174,30 @@ const CustomerPage = () => {
     }
   };
 
+  const getUuid = async (tablenumber) => {
+    try {
+      const response = await fetch(`http://localhost:3001/Customer/get/${tablenumber}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const result = await response.json();
+      if (response.ok) {
+        console.log('UUID:', result.table_id); // ใช้ result.table_id แทน
+        setUuid(result.table_id); // เก็บ table_id ใน state uuid
+      } else {
+        console.error('API error:', result.error);
+      }
+    } catch (error) {
+      console.error('Error getting UUID:', error);
+    }
+  };
+  
+  
+
+
   // Remove item from cart
   const removeItemFromBackend = async (orderId, itemId) => {
     try {
@@ -247,16 +246,21 @@ const CustomerPage = () => {
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
+    
   }, [cart]);
-//ของคิว
-  // Handle checkout
-  // const handleCheckout = () => {
-  //   setShowPopup(true);  // Show the popup
-  //   setIsCartOpen(false);  // Close the cart
-  // };
+
+  useEffect(() => {
+    getUuid(tablenumber);
+  }, [tablenumber]);
 
   const handleCheckout = async () => {
-    const tableId = '1f375e5b-118d-490e-915b-84d06287f129'; // ID ของโต๊ะที่เกี่ยวข้อง//-----------------------------------------------------
+    // ตรวจสอบและดึง UUID หากยังไม่มีค่า
+    if (!uuid) {
+      console.log('กำลังดึง UUID...');
+      await getUuid(tablenumber);
+    }
+  
+    const tableId = `${uuid}`; // ใช้ UUID ที่ได้จาก state
     const orderStatus = 'Pending'; // สถานะเริ่มต้น
     const cartItems = cart.map((item) => ({
       category_item_id: item.id,
@@ -288,6 +292,7 @@ const CustomerPage = () => {
       console.error('เกิดข้อผิดพลาดในการสั่งสินค้า:', error);
     }
   };
+  
 
   // Close the popup and clear the cart
   const handleClosePopup = () => {
@@ -312,7 +317,7 @@ const CustomerPage = () => {
               className="w-20 h-20 object-contain"
             />
             <h2 className="text-xl font-extrabold text-red-700 tracking-wide">หมวดหมู่อาหาร</h2>
-            <h3 className="text-s font-extrabold text-red-700 tracking-wide">โต๊ะที่: {tablenumber}</h3>
+            <h3 className="text-s font-extrabold text-red-700 tracking-wide">โต๊ะที่: {tablenumber} </h3>
             <h3 className="text-s font-extrabold text-red-700 tracking-wide">จํานวนคน: {countnumber}</h3>
           </div>
 
